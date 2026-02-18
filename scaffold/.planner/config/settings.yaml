@@ -1,0 +1,14 @@
+# Jacques2 Project Settings
+
+project:
+  name: "my-project"
+  language: "python"
+  platform: "general"   # or: ros2
+
+planner:
+  specs_dir: ".planner/specs"
+  features_file: ".planner/features/features.md"
+  tasks_dir: ".planner/tasks"
+  templates_dir: ".planner/templates"
+  principles_file: ".planner/principles.md"
+  snapshots_dir: "snapshots"
