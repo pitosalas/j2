@@ -42,8 +42,8 @@ TASKS_TEXT = """\
 # --- find_placeholders ---
 
 def test_find_placeholders_detects_all():
-    template = "Hello {{name}}, your spec is {{spec}} and principles are {{principles}}."
-    assert runner.find_placeholders(template) == {"name", "spec", "principles"}
+    template = "Hello {{name}}, your spec is {{spec}} and rules are {{rules}}."
+    assert runner.find_placeholders(template) == {"name", "spec", "rules"}
 
 def test_find_placeholders_empty():
     assert runner.find_placeholders("No placeholders here.") == set()
@@ -138,3 +138,27 @@ def test_load_workflow(tmp_path):
 def test_load_config_missing_file(tmp_path):
     with pytest.raises(FileNotFoundError):
         runner.load_config(tmp_path)
+
+
+# --- build_context graceful fallback ---
+
+def test_build_context_substitutes_placeholder_for_missing_file(tmp_path):
+    # Missing files should produce a descriptive placeholder, not crash.
+    settings = {
+        "planner": {
+            "features_file": ".planner/features/features.md",
+            "specs_dir": ".planner/specs",
+            "rules_file": ".planner/rules.md",
+            "tasks_dir": ".planner/tasks",
+            "templates_dir": ".planner/templates",
+        }
+    }
+
+    class FakeArgs:
+        feature = "F01"
+        task = "T01"
+        request = None
+
+    context = runner.build_context(tmp_path, settings, {"features"}, FakeArgs())
+    assert "features" in context
+    assert "not yet available" in context["features"]

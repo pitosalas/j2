@@ -3,7 +3,7 @@ You are helping a developer implement a specific task in a software project.
 Read the task description carefully, then implement it. You must follow the coding principles below exactly.
 
 --- PRINCIPLES BEGIN ---
-{{principles}}
+{{rules}}
 --- PRINCIPLES END ---
 
 After writing the code, briefly explain what you implemented and any decisions you made.

@@ -3,7 +3,7 @@ You are helping a developer plan a software project.
 Keep these coding principles in mind when generating features — they will constrain how each feature is implemented:
 
 --- PRINCIPLES BEGIN ---
-{{principles}}
+{{rules}}
 --- PRINCIPLES END ---
 
 Read the following project specification and generate a feature list.

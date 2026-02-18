@@ -10,5 +10,5 @@ planner:
   features_file: ".planner/features/features.md"
   tasks_dir: ".planner/tasks"
   templates_dir: ".planner/templates"
-  principles_file: ".planner/principles.md"
+  rules_file: ".planner/rules.md"
   snapshots_dir: "snapshots"

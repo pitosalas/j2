@@ -58,9 +58,9 @@ def load_features(root, settings):
     return path.read_text()
 
 
-def load_principles(root, settings):
+def load_rules(root, settings):
     # Read and return the principles file.
-    path = root / settings["planner"]["principles_file"]
+    path = root / settings["planner"]["rules_file"]
     return path.read_text()
 
 
@@ -99,7 +99,7 @@ def build_context(root, settings, placeholders, args):
     # Load each context value needed by the template, based on which placeholders are present.
     loaders = {
         "spec":       lambda: load_spec(root, settings),
-        "principles": lambda: load_principles(root, settings),
+        "rules":      lambda: load_rules(root, settings),
         "features":   lambda: load_features(root, settings),
         "feature":    lambda: extract_feature(load_features(root, settings), args.feature),
         "tasks":      lambda: load_tasks(root, settings, args.feature),
@@ -111,7 +111,10 @@ def build_context(root, settings, placeholders, args):
         if placeholder not in loaders:
             print(f"Warning: no loader for placeholder {{{{{placeholder}}}}}", file=sys.stderr)
             continue
-        context[placeholder] = loaders[placeholder]()
+        try:
+            context[placeholder] = loaders[placeholder]()
+        except FileNotFoundError as e:
+            context[placeholder] = f"(not yet available: {e.filename})"
     return context
 
 

@@ -19,7 +19,7 @@ The framework is delivered as a directory tree that users copy or clone into a n
 ```
 .planner/
   prompt.md           # Meta-instructions for Claude about the framework
-  principles.md       # User-defined coding principles injected into all commands
+  rules.md       # User-defined coding principles injected into all commands
   specs/              # User-provided or generated project specifications
   features/           # Generated feature lists (includes per-feature status tracking)
   tasks/              # Generated task breakdowns per feature
@@ -57,8 +57,14 @@ Interactive refinement of task lists for a given feature.
 ### Step 6: `/start-task`
 Begins implementation of a specified task. Claude reads the task description and writes code.
 
-### Step 7: `/milestone`
-Copies all project files into a timestamped snapshot directory for safe testing.
+### Step 7: `/try`
+Copies all project files into a timestamped snapshot directory under `snapshots/` for experimentation. No quality checks — just a raw snapshot so the developer can play with the current state without affecting the working directory.
+
+### Step 8: `/checkpoint`
+Saves current working context to `.planner/current.md` so the developer can resume later. Can be run at any point — it is not a quality gate.
+
+### Step 9: `/milestone`
+Declares a feature complete. Confirms that implementation is done, tests are written, and tests are passing. Acts as a quality gate: if tests are missing or failing, the milestone is not granted.
 
 ## Slash Command Implementation
 

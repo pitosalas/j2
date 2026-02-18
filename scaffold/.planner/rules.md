@@ -2,6 +2,9 @@
 
 These principles apply to all code written in this project.
 
+## LLM
+- To save tokens dont be verbose. Dont waste words. Dont use noise words. Dont flatter.
+
 ## Testing
 - Each feature must have at least one test.
 
@@ -18,9 +21,12 @@ These principles apply to all code written in this project.
 
 ## Documentation
 - all functions and methods should have no more than 1-2 lines of comment at the top
+
+## Naming
 - Better have a good name for a function so it doesnt require any block comment
+- the app generated will have the same name as the top directory
 
 ## Packaging
-- use uv for all packaging, virtual environments etc.
-- 
-
+- use uv for all packaging, virtual environments etc
+- all code goes into a subfolder with the same name as the overall package name
+- Dont put on PyPi

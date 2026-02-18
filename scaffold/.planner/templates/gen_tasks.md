@@ -3,7 +3,7 @@ You are helping a developer break down a software feature into implementation ta
 You must follow these coding principles when generating tasks:
 
 --- PRINCIPLES BEGIN ---
-{{principles}}
+{{rules}}
 --- PRINCIPLES END ---
 
 Read the feature description and generate a task list. Each task should be:

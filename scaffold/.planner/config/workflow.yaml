@@ -37,7 +37,24 @@ steps:
     template: "start_task.md"
     description: "Begin implementation of a specific task."
 
+  - id: next-task
+    command: "/next-task"
+    template: "next_task.md"
+    description: "Automatically find and implement the next pending task."
+
+  - id: try
+    command: "/try"
+    template: "try.md"
+    output: "snapshots/"
+    description: "Copy project files into a timestamped snapshot directory for experimentation."
+
+  - id: checkpoint
+    command: "/checkpoint"
+    template: "checkpoint.md"
+    output: ".planner/current.md"
+    description: "Save current working context to current.md so work can be resumed later."
+
   - id: milestone
     command: "/milestone"
     template: "milestone.md"
-    description: "Snapshot all project files into a timestamped directory."
+    description: "Declare a feature done — confirms implementation, tests written, tests passing."

@@ -34,7 +34,11 @@ echo "PyYAML ... OK"
 
 # --- Copy scaffold ---
 echo "Copying scaffold to $TARGET_DIR ..."
-cp -rn "$SCRIPT_DIR/scaffold/." "$TARGET_DIR/"
+rsync -a --ignore-existing \
+  --exclude='__pycache__' \
+  --exclude='*.pyc' \
+  --exclude='.DS_Store' \
+  "$SCRIPT_DIR/" "$TARGET_DIR/"
 echo "Scaffold copied."
 
 # --- Validate YAML configs ---
