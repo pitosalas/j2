@@ -4,7 +4,17 @@
       "Bash(mkdir:*)",
       "Bash(chmod:*)",
       "Bash(find:*)",
-      "Bash(uv run pytest:*)"
+      "Bash(uv run pytest:*)",
+      "Bash(uv lock:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(for f in /Users/pitosalas/mydev/jacques2/scaffold/.j2/templates/*.md)",
+      "Bash(do)",
+      "Bash(if grep -q '{{rules}}' \"$f\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(python3:*)",
+      "Bash(git -C /Users/pitosalas/mydev/jacques2 log --oneline -5)",
+      "Bash(git add:*)"
     ]
   }
 }

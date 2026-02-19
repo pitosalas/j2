@@ -1,0 +1,60 @@
+# j2 Workflow Definition
+# Steps are executed in order. Each maps to a slash command and a prompt template.
+
+steps:
+  - id: spec-review
+    command: "/spec-review"
+    template: "spec_review.md"
+    output: ".j2/features/spec-review.md"
+    description: "Summarize the spec and surface clarifying questions."
+
+  - id: gen-features
+    command: "/gen-features"
+    template: "gen_features.md"
+    output: ".j2/features/features.md"
+    description: "Generate a prioritized feature list from the spec."
+
+  - id: refine-features
+    command: "/refine-features"
+    template: "refine_features.md"
+    output: ".j2/features/features.md"
+    description: "Interactively refine the feature list."
+
+  - id: gen-tasks
+    command: "/gen-tasks"
+    template: "gen_tasks.md"
+    output: ".j2/tasks/{feature}.md"
+    description: "Generate task breakdowns for each feature."
+
+  - id: refine-tasks
+    command: "/refine-tasks"
+    template: "refine_tasks.md"
+    output: ".j2/tasks/{feature}.md"
+    description: "Refine the task list for a given feature."
+
+  - id: start-task
+    command: "/start-task"
+    template: "start_task.md"
+    description: "Begin implementation of a specific task."
+
+  - id: next-task
+    command: "/next-task"
+    template: "next_task.md"
+    description: "Automatically find and implement the next pending task."
+
+  - id: try
+    command: "/try"
+    template: "try.md"
+    output: "snapshots/"
+    description: "Copy project files into a timestamped snapshot directory for experimentation."
+
+  - id: checkpoint
+    command: "/checkpoint"
+    template: "checkpoint.md"
+    output: ".j2/current.md"
+    description: "Save current working context to current.md so work can be resumed later."
+
+  - id: milestone
+    command: "/milestone"
+    template: "milestone.md"
+    description: "Declare a feature done — confirms implementation, tests written, tests passing."

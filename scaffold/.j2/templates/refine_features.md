@@ -15,6 +15,7 @@ The current feature list is below. The developer may ask you to:
 - Rewrite a feature description
 
 Apply the requested changes and output the complete updated feature list in the same format.
+Preserve the status values legend at the top of the output exactly as it appears in the input.
 Do not make changes beyond what was requested.
 
 --- CURRENT FEATURES BEGIN ---

@@ -1,1 +1,1 @@
-$(python3 .planner/runner.py checkpoint --root .)
+$(python3 .j2/runner.py checkpoint --root .)

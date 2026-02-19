@@ -1,1 +1,1 @@
-$(python3 .planner/runner.py spec-review --root .)
+$(python3 .j2/runner.py spec-review --root .)

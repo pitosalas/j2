@@ -15,7 +15,16 @@ For each feature:
 - Assign a priority: High, Medium, or Low
 - Include status fields initialized to their default values
 
-Format each feature as:
+Begin the output with this header exactly:
+
+```
+Status values:
+- **Status**: `not started` / `in progress` / `done`
+- **Tests written**: `no` / `yes`
+- **Tests passing**: `n/a` / `no` / `yes`
+```
+
+Then list each feature separated by `---`. Format each feature as:
 
 ## F01 — Feature Name
 **Priority**: High

@@ -1,35 +1,35 @@
-# Jacques2 Workflow Definition
+# j2 Workflow Definition
 # Steps are executed in order. Each maps to a slash command and a prompt template.
 
 steps:
   - id: spec-review
     command: "/spec-review"
     template: "spec_review.md"
-    output: ".planner/features/spec-review.md"
+    output: ".j2/features/spec-review.md"
     description: "Summarize the spec and surface clarifying questions."
 
   - id: gen-features
     command: "/gen-features"
     template: "gen_features.md"
-    output: ".planner/features/features.md"
+    output: ".j2/features/features.md"
     description: "Generate a prioritized feature list from the spec."
 
   - id: refine-features
     command: "/refine-features"
     template: "refine_features.md"
-    output: ".planner/features/features.md"
+    output: ".j2/features/features.md"
     description: "Interactively refine the feature list."
 
   - id: gen-tasks
     command: "/gen-tasks"
     template: "gen_tasks.md"
-    output: ".planner/tasks/{feature}.md"
+    output: ".j2/tasks/{feature}.md"
     description: "Generate task breakdowns for each feature."
 
   - id: refine-tasks
     command: "/refine-tasks"
     template: "refine_tasks.md"
-    output: ".planner/tasks/{feature}.md"
+    output: ".j2/tasks/{feature}.md"
     description: "Refine the task list for a given feature."
 
   - id: start-task
@@ -51,7 +51,7 @@ steps:
   - id: checkpoint
     command: "/checkpoint"
     template: "checkpoint.md"
-    output: ".planner/current.md"
+    output: ".j2/current.md"
     description: "Save current working context to current.md so work can be resumed later."
 
   - id: milestone

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Jacques2 installer
+# j2 installer
 # Copies the scaffold into the current directory and validates the setup.
 
 set -euo pipefail
@@ -7,8 +7,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_DIR="${1:-.}"
 
-echo "Jacques2 installer"
-echo "=================="
+echo "j2 installer"
+echo "============"
 
 # --- Python version check ---
 if ! command -v python3 &>/dev/null; then
@@ -33,6 +33,9 @@ fi
 echo "PyYAML ... OK"
 
 # --- Copy scaffold ---
+# NOTE: slash commands in scaffold/.claude/commands/ reference runner.py as ".j2/runner.py"
+# (the path in a user's installed project). The dev repo's .claude/commands/ uses
+# "scaffold/.j2/runner.py" instead. This difference is intentional — do not "fix" it.
 echo "Copying scaffold to $TARGET_DIR ..."
 rsync -a --ignore-existing \
   --exclude='__pycache__' \
@@ -43,7 +46,7 @@ echo "Scaffold copied."
 
 # --- Validate YAML configs ---
 echo "Validating config files..."
-for f in "$TARGET_DIR/.planner/config/"*.yaml; do
+for f in "$TARGET_DIR/.j2/config/"*.yaml; do
   python3 -c "import yaml, sys; yaml.safe_load(open('$f'))" \
     && echo "  $f ... OK" \
     || { echo "  ERROR: $f is invalid YAML" >&2; exit 1; }
@@ -52,6 +55,7 @@ done
 echo ""
 echo "Installation complete."
 echo "Next steps:"
-echo "  1. Edit .planner/config/settings.yaml with your project name."
-echo "  2. Add your project spec to .planner/specs/"
-echo "  3. Run /spec-review in Claude Code to begin."
+echo "  1. Edit .j2/config/settings.yaml with your project name."
+echo "  2. Edit .j2/rules.md with your project's coding principles (language, testing rules, style, etc.)."
+echo "  3. Add your project spec to .j2/specs/"
+echo "  4. Run /spec-review in Claude Code to begin."

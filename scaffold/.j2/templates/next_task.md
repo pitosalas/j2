@@ -21,7 +21,7 @@ Follow these coding rules exactly:
    - Otherwise use the first feature with **Status**: `not started` that has High priority.
    - Skip features marked `done`.
 
-2. Read the task file for that feature from `.planner/tasks/<feature-id>.md`.
+2. Read the task file for that feature from `.j2/tasks/<feature-id>.md`.
    If no task file exists yet, tell the user to run `/gen-tasks <feature-id>` first.
 
 3. Find the first task in that file that has not been implemented yet.

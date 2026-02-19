@@ -20,6 +20,7 @@ For each task include:
 Format each task as:
 
 ### T01 — Task Title
+**Status**: not started
 **Description**: ...
 
 --- SPEC BEGIN ---

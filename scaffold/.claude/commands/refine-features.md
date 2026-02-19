@@ -1,1 +1,1 @@
-$(python3 .planner/runner.py refine-features --request "$ARGUMENTS" --root .)
+$(python3 .j2/runner.py refine-features --request "$ARGUMENTS" --root .)

@@ -1,1 +1,1 @@
-$(python3 .planner/runner.py gen-features --root .)
+$(python3 .j2/runner.py gen-features --root .)
