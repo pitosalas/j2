@@ -1,1 +1,1 @@
-$(python3 scaffold/.j2/runner.py task-next --root .)
+$(python3 .j2/runner.py task-next --root .)

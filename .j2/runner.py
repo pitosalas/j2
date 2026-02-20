@@ -11,11 +11,14 @@ import yaml
 FOOTER = """
 ---
 End your response with exactly these three lines, formatted with markdown bold labels to make them visually distinct (nothing after them):
-**completed:** <one sentence: what was just done>
-**state:** <N> spec gaps | <N> features need tasks | <N> tasks pending   ← replace each <N> with an actual integer count
-**next:** <the exact slash command to run next, e.g. /task-next or /tasks-gen F11>
+\033[32mcompleted:\033[0m <one sentence: what was just done>
+\033[33mstate:\033[0m <N> spec gaps | <N> features need tasks | <N> tasks pending   ← replace each <N> with an actual integer count
+\033[36mnext:\033[0m <slash command — determined by this priority order:
+  1. If spec gaps > 0 (previous run reported {{prev_spec_gaps}} gaps) → /refresh
+  2. Else if not-done features lack task files ({{missing_tasks}}) → /tasks-gen <first listed>
+  3. Else → /task-next>
 
-Also write these three lines to .j2/state.md (overwriting it), without the markdown bold.
+Also write these three lines to .j2/state.md (overwriting it), without ANSI codes and without the markdown bold.
 """
 
 
@@ -98,6 +101,53 @@ def extract_task(tasks_text, task_id):
     return match.group(1).strip()
 
 
+def prev_spec_gaps(root):
+    # Read spec gap count from the last state.md; default to 0 if missing or unparseable.
+    state_path = root / ".j2" / "state.md"
+    try:
+        match = re.search(r"(\d+)\s+spec gaps", state_path.read_text())
+        return match.group(1) if match else "0"
+    except FileNotFoundError:
+        return "0"
+
+
+def missing_tasks_summary(root, settings):
+    # Return comma-separated not-done features missing task files, sorted by priority.
+    priority_order = {"high": 0, "medium": 1, "low": 2}
+    try:
+        features_text = load_features(root, settings)
+    except FileNotFoundError:
+        return "none"
+    tasks_dir = root / settings["j2"]["tasks_dir"]
+    pattern = r"^## (F\d+) —.*?\n\*\*Priority\*\*: (\w+)\n\*\*Status\*\*: ([^\n|]+)"
+    missing = []
+    for fid, priority, status in re.findall(pattern, features_text, re.MULTILINE):
+        if status.strip().lower() == "done":
+            continue
+        if not (tasks_dir / f"{fid}.md").exists() and not (tasks_dir / "done" / f"{fid}.md").exists():
+            missing.append((priority_order.get(priority.lower(), 9), fid, priority))
+    missing.sort()
+    return ", ".join(f"{fid} ({pri})" for _, fid, pri in missing) or "none"
+
+
+def find_default_feature(root, settings):
+    # Return the first in-progress feature ID, or the first not-started feature ID.
+    try:
+        features_text = load_features(root, settings)
+    except FileNotFoundError:
+        return "F01"
+    pattern = r"^## (F\d+) —.*?\n\*\*Priority\*\*: \w+\n\*\*Status\*\*: ([^\n|]+)"
+    in_progress = None
+    not_started = None
+    for fid, status in re.findall(pattern, features_text, re.MULTILINE):
+        s = status.strip().lower()
+        if s == "in progress" and in_progress is None:
+            in_progress = fid
+        elif s == "not started" and not_started is None:
+            not_started = fid
+    return in_progress or not_started or "F01"
+
+
 def fill_template(template, context):
     # Replace all {{key}} tokens in a single pass so substituted values are not re-scanned.
     def replacer(match):
@@ -114,7 +164,11 @@ def build_context(root, settings, placeholders, args):
         "feature":    lambda: extract_feature(load_features(root, settings), args.feature),
         "tasks":      lambda: load_tasks(root, settings, args.feature),
         "task":       lambda: extract_task(load_tasks(root, settings, args.feature), args.task),
-        "request":    lambda: args.request,
+        "request":          lambda: args.request,
+        "default_feature":  lambda: find_default_feature(root, settings),
+        "prev_spec_gaps": lambda: prev_spec_gaps(root),
+        "missing_tasks":  lambda: missing_tasks_summary(root, settings),
+        "state":          lambda: (root / ".j2" / "state.md").read_text(),
     }
     context = {}
     for placeholder in placeholders:
@@ -142,7 +196,7 @@ def resolve_next_command(root, args):
 
 def main():
     parser = argparse.ArgumentParser(description="j2 template runner")
-    parser.add_argument("command", help="Workflow command ID (e.g. task-next), or 'next' to read from state.md")
+    parser.add_argument("command", help="Workflow command ID (e.g. task-next), or 'continue' to read from state.md")
     parser.add_argument("--feature", default=None, help="Feature ID (e.g. F01)")
     parser.add_argument("--task", default=None, help="Task ID (e.g. T01)")
     parser.add_argument("--request", default=None, help="Refinement request text")
@@ -152,15 +206,16 @@ def main():
     root = Path(args.root).resolve()
 
     try:
-        if args.command == "next":
+        if args.command == "continue":
             resolve_next_command(root, args)
         settings = load_config(root)
         workflow = load_workflow(root)
         step = find_step(workflow, args.command)
         template = load_template(root, settings, step["template"])
         placeholders = find_placeholders(template)
-        context = build_context(root, settings, placeholders, args)
-        print(fill_template(template, context) + FOOTER)
+        footer_placeholders = find_placeholders(FOOTER)
+        context = build_context(root, settings, placeholders | footer_placeholders, args)
+        print(fill_template(template, context) + fill_template(FOOTER, context))
     except (FileNotFoundError, KeyError, ValueError) as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)

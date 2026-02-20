@@ -1,4 +1,8 @@
-You are helping a developer break down a software feature into implementation tasks.
+Output ONLY the following line and nothing else, then stop and wait for the user's input:
+
+`Feature ID [{{default_feature}}]: `
+
+After the user responds with a feature ID, generate or update the task list for that feature following the instructions below.
 
 You must follow these coding principles when generating tasks:
 
@@ -37,9 +41,9 @@ Format each task as:
 {{spec}}
 --- SPEC END ---
 
---- FEATURE BEGIN ---
-{{feature}}
---- FEATURE END ---
+--- FEATURES BEGIN ---
+{{features}}
+--- FEATURES END ---
 
 --- CURRENT TASKS BEGIN ---
 {{tasks}}

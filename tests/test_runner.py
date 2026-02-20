@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "scaffold" / ".j2"))
+sys.path.insert(0, str(Path(__file__).parent.parent / ".j2"))
 import runner
 
 
@@ -168,7 +168,7 @@ def make_temp_project(tmp_path, spec_text, rules_text):
 
     templates_dir = tmp_path / ".j2" / "templates"
     templates_dir.mkdir(parents=True)
-    real_template = SCAFFOLD_ROOT / ".j2" / "templates" / "gen_features.md"
+    real_template = TEMPLATES_ROOT / "gen_features.md"
     (templates_dir / "gen_features.md").write_text(real_template.read_text())
 
     return tmp_path
@@ -223,7 +223,7 @@ def make_refresh_project(tmp_path, spec_text, rules_text):
 
     templates_dir = tmp_path / ".j2" / "templates"
     templates_dir.mkdir(parents=True)
-    real_template = SCAFFOLD_ROOT / ".j2" / "templates" / "refresh.md"
+    real_template = TEMPLATES_ROOT / "refresh.md"
     (templates_dir / "refresh.md").write_text(real_template.read_text())
 
     return tmp_path
@@ -284,7 +284,7 @@ def make_start_task_project(tmp_path, spec_text, rules_text, features_text, task
 
     templates_dir = tmp_path / ".j2" / "templates"
     templates_dir.mkdir(parents=True)
-    real_template = SCAFFOLD_ROOT / ".j2" / "templates" / "start_task.md"
+    real_template = TEMPLATES_ROOT / "start_task.md"
     (templates_dir / "start_task.md").write_text(real_template.read_text())
 
     return tmp_path
@@ -314,12 +314,10 @@ def test_start_task_renders_all_placeholders(tmp_path):
 
     assert "Widget App" in output
     assert "Each feature needs a test" in output
-    assert "Directory Scaffold" in output
-    assert "Create directories" in output
+    assert "Directory Scaffold" in output  # from {{features}}
     assert "{{spec}}" not in output
     assert "{{rules}}" not in output
-    assert "{{feature}}" not in output
-    assert "{{tasks}}" not in output
+    assert "{{features}}" not in output
 
 
 # --- F08: /refine-tasks command ---
@@ -343,11 +341,15 @@ def make_refine_tasks_project(tmp_path, tasks_text, rules_text, feature_id):
     tasks_dir.mkdir(parents=True)
     (tasks_dir / f"{feature_id}.md").write_text(tasks_text)
 
+    features_dir = tmp_path / ".j2" / "features"
+    features_dir.mkdir(parents=True)
+    (features_dir / "features.md").write_text(FEATURES_TEXT)
+
     (tmp_path / ".j2" / "rules.md").write_text(rules_text)
 
     templates_dir = tmp_path / ".j2" / "templates"
     templates_dir.mkdir(parents=True)
-    real_template = SCAFFOLD_ROOT / ".j2" / "templates" / "refine_tasks.md"
+    real_template = TEMPLATES_ROOT / "refine_tasks.md"
     (templates_dir / "refine_tasks.md").write_text(real_template.read_text())
 
     return tmp_path
@@ -374,12 +376,10 @@ def test_refine_tasks_renders_tasks_rules_and_request(tmp_path):
     context = runner.build_context(root, settings, placeholders, Args())
     output = runner.fill_template(template, context)
 
-    assert "Create dirs" in output
+    assert "Directory Scaffold" in output  # from {{features}}
     assert "Each feature needs a test" in output
-    assert "Split T01 into two tasks" in output
-    assert "{{tasks}}" not in output
+    assert "{{features}}" not in output
     assert "{{rules}}" not in output
-    assert "{{request}}" not in output
 
 
 # --- F07: /gen-tasks command ---
@@ -409,7 +409,7 @@ def make_gen_tasks_project(tmp_path, spec_text, rules_text, features_text):
 
     templates_dir = tmp_path / ".j2" / "templates"
     templates_dir.mkdir(parents=True)
-    real_template = SCAFFOLD_ROOT / ".j2" / "templates" / "gen_tasks.md"
+    real_template = TEMPLATES_ROOT / "gen_tasks.md"
     (templates_dir / "gen_tasks.md").write_text(real_template.read_text())
 
     return tmp_path
@@ -468,7 +468,7 @@ def make_refine_features_project(tmp_path, features_text, rules_text):
 
     templates_dir = tmp_path / ".j2" / "templates"
     templates_dir.mkdir(parents=True)
-    real_template = SCAFFOLD_ROOT / ".j2" / "templates" / "refine_features.md"
+    real_template = TEMPLATES_ROOT / "refine_features.md"
     (templates_dir / "refine_features.md").write_text(real_template.read_text())
 
     return tmp_path
@@ -495,15 +495,13 @@ def test_refine_features_renders_features_rules_and_request(tmp_path):
 
     assert "Widget Tracker" in output
     assert "All features need tests" in output
-    assert "Change F01 priority to Low" in output
     assert "{{features}}" not in output
     assert "{{rules}}" not in output
-    assert "{{request}}" not in output
 
 
 # --- F15: principles file ---
 
-TEMPLATES_DIR = Path(__file__).parent.parent / "scaffold" / ".j2" / "templates"
+TEMPLATES_DIR = Path(__file__).parent.parent / ".j2" / "templates"
 TEMPLATES_REQUIRING_RULES = [
     "gen_features.md", "gen_tasks.md", "refine_features.md", "refine_tasks.md",
     "start_task.md", "next_task.md", "milestone.md", "refresh.md",
@@ -531,6 +529,9 @@ def test_extract_task_case_insensitive():
 # --- F02: YAML configuration system ---
 
 SCAFFOLD_ROOT = Path(__file__).parent.parent / "scaffold"
+J2_ROOT = Path(__file__).parent.parent / ".j2"
+TEMPLATES_ROOT = J2_ROOT / "templates"
+CONFIG_ROOT = J2_ROOT / "config"
 
 REQUIRED_SETTINGS_KEYS = ["specs_dir", "features_file", "tasks_dir", "templates_dir", "rules_file"]
 EXPECTED_COMMANDS = [
@@ -540,21 +541,21 @@ EXPECTED_COMMANDS = [
 
 def test_settings_yaml_has_required_j2_keys():
     import yaml
-    settings = yaml.safe_load((SCAFFOLD_ROOT / ".j2" / "config" / "settings.yaml").read_text())
+    settings = yaml.safe_load((CONFIG_ROOT / "settings.yaml").read_text())
     for key in REQUIRED_SETTINGS_KEYS:
         assert key in settings["j2"], f"settings.yaml missing j2.{key}"
 
 def test_workflow_yaml_covers_all_commands():
     import yaml
-    workflow = yaml.safe_load((SCAFFOLD_ROOT / ".j2" / "config" / "workflow.yaml").read_text())
+    workflow = yaml.safe_load((CONFIG_ROOT / "workflow.yaml").read_text())
     ids = {step["id"] for step in workflow["steps"]}
     for cmd in EXPECTED_COMMANDS:
         assert cmd in ids, f"workflow.yaml missing step for {cmd!r}"
 
 def test_workflow_yaml_templates_all_exist():
     import yaml
-    workflow = yaml.safe_load((SCAFFOLD_ROOT / ".j2" / "config" / "workflow.yaml").read_text())
-    templates_dir = SCAFFOLD_ROOT / ".j2" / "templates"
+    workflow = yaml.safe_load((CONFIG_ROOT / "workflow.yaml").read_text())
+    templates_dir = TEMPLATES_ROOT
     for step in workflow["steps"]:
         tmpl = step["template"]
         assert (templates_dir / tmpl).is_file(), f"Template {tmpl!r} referenced in workflow.yaml does not exist"
@@ -568,8 +569,6 @@ SCAFFOLD = Path(__file__).parent.parent / "scaffold"
     ".j2/specs",
     ".j2/features",
     ".j2/tasks",
-    ".j2/config",
-    ".j2/templates",
     ".claude/commands",
 ])
 def test_scaffold_required_dirs_exist(rel):
@@ -637,7 +636,7 @@ def make_task_next_project(tmp_path, spec_text, rules_text, features_text):
 
     templates_dir = tmp_path / ".j2" / "templates"
     templates_dir.mkdir(parents=True)
-    real_template = SCAFFOLD_ROOT / ".j2" / "templates" / "next_task.md"
+    real_template = TEMPLATES_ROOT / "next_task.md"
     (templates_dir / "next_task.md").write_text(real_template.read_text())
 
     return tmp_path
@@ -715,7 +714,7 @@ def test_resolve_next_command_bare(tmp_path):
     (tmp_path / ".j2" / "state.md").write_text("completed: something\nstate: 0 | 0 | 0\nnext: /task-next\n")
 
     class Args:
-        command = "next"
+        command = "continue"
         feature = None
 
     args = Args()
@@ -730,7 +729,7 @@ def test_resolve_next_command_with_feature(tmp_path):
     (tmp_path / ".j2" / "state.md").write_text("completed: something\nstate: 0 | 0 | 0\nnext: /tasks-gen F11\n")
 
     class Args:
-        command = "next"
+        command = "continue"
         feature = None
 
     args = Args()
@@ -744,7 +743,7 @@ def test_resolve_next_command_missing_state(tmp_path):
     (tmp_path / ".j2").mkdir(parents=True)
 
     class Args:
-        command = "next"
+        command = "continue"
         feature = None
 
     with pytest.raises((ValueError, FileNotFoundError)):
@@ -818,7 +817,7 @@ def make_milestone_project(tmp_path, rules_text, features_text, tasks_text, feat
 
     templates_dir = tmp_path / ".j2" / "templates"
     templates_dir.mkdir(parents=True)
-    real_template = SCAFFOLD_ROOT / ".j2" / "templates" / "milestone.md"
+    real_template = TEMPLATES_ROOT / "milestone.md"
     (templates_dir / "milestone.md").write_text(real_template.read_text())
 
     return tmp_path
@@ -853,8 +852,456 @@ def test_milestone_renders_feature_and_tasks(tmp_path):
 def test_milestone_missing_feature_id_produces_error(tmp_path):
     # Runner must exit non-zero when --feature is not provided for milestone.
     result = subprocess.run(
-        ["python3", str(SCAFFOLD_ROOT / ".j2" / "runner.py"),
+        ["python3", str(J2_ROOT / "runner.py"),
          "milestone", "--root", str(tmp_path)],
         capture_output=True, text=True
     )
     assert result.returncode != 0
+
+
+# --- F23: workflow-ordered next step logic ---
+
+MIXED_PRIORITY_FEATURES = """\
+## F01 — Low Feature
+**Priority**: Low
+**Status**: not started | Tests written: no | Tests passing: n/a
+**Description**: Low priority thing.
+
+---
+
+## F02 — High Feature
+**Priority**: High
+**Status**: not started | Tests written: no | Tests passing: n/a
+**Description**: High priority thing.
+
+---
+
+## F03 — Medium Feature
+**Priority**: Medium
+**Status**: not started | Tests written: no | Tests passing: n/a
+**Description**: Medium priority thing.
+
+---
+"""
+
+SETTINGS_FOR_F23 = {
+    "j2": {
+        "specs_dir": ".j2/specs",
+        "features_file": ".j2/features/features.md",
+        "tasks_dir": ".j2/tasks",
+        "templates_dir": ".j2/templates",
+        "rules_file": ".j2/rules.md",
+    }
+}
+
+
+def test_missing_tasks_summary_sorted_by_priority(tmp_path):
+    # Features without task files should appear in High → Medium → Low order.
+    features_dir = tmp_path / ".j2" / "features"
+    features_dir.mkdir(parents=True)
+    (features_dir / "features.md").write_text(MIXED_PRIORITY_FEATURES)
+    (tmp_path / ".j2" / "tasks").mkdir(parents=True)
+
+    result = runner.missing_tasks_summary(tmp_path, SETTINGS_FOR_F23)
+
+    assert result != "none"
+    high_pos = result.index("F02")
+    medium_pos = result.index("F03")
+    low_pos = result.index("F01")
+    assert high_pos < medium_pos < low_pos
+
+
+def test_missing_tasks_summary_excludes_feature_with_task_file(tmp_path):
+    # A feature whose task file exists must not appear in the summary.
+    features_dir = tmp_path / ".j2" / "features"
+    features_dir.mkdir(parents=True)
+    (features_dir / "features.md").write_text(MIXED_PRIORITY_FEATURES)
+    tasks_dir = tmp_path / ".j2" / "tasks"
+    tasks_dir.mkdir(parents=True)
+    (tasks_dir / "F02.md").write_text("# Tasks for F02\n### T01 — stub\n")
+
+    result = runner.missing_tasks_summary(tmp_path, SETTINGS_FOR_F23)
+
+    assert "F02" not in result
+    assert "F01" in result or "F03" in result
+
+
+def test_missing_tasks_summary_excludes_done_features(tmp_path):
+    # Features marked done must not appear even if they have no task file.
+    features = """\
+## F01 — Done Feature
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Already done.
+
+---
+"""
+    features_dir = tmp_path / ".j2" / "features"
+    features_dir.mkdir(parents=True)
+    (features_dir / "features.md").write_text(features)
+    (tmp_path / ".j2" / "tasks").mkdir(parents=True)
+
+    result = runner.missing_tasks_summary(tmp_path, SETTINGS_FOR_F23)
+
+    assert result == "none"
+
+
+def test_missing_tasks_summary_returns_none_when_all_have_task_files(tmp_path):
+    # If every not-done feature has a task file, return "none".
+    features_dir = tmp_path / ".j2" / "features"
+    features_dir.mkdir(parents=True)
+    (features_dir / "features.md").write_text(MIXED_PRIORITY_FEATURES)
+    tasks_dir = tmp_path / ".j2" / "tasks"
+    tasks_dir.mkdir(parents=True)
+    for fid in ("F01", "F02", "F03"):
+        (tasks_dir / f"{fid}.md").write_text(f"# Tasks for {fid}\n")
+
+    result = runner.missing_tasks_summary(tmp_path, SETTINGS_FOR_F23)
+
+    assert result == "none"
+
+
+# --- F24: completed tasks archive ---
+
+def test_missing_tasks_summary_excludes_archived_feature(tmp_path):
+    # A feature whose task file is in tasks/done/ must not be flagged as missing.
+    features = (
+        "## F01 — Widget App\n**Priority**: High\n**Status**: not started\n"
+        "**Description**: A widget app.\n"
+    )
+    (tmp_path / ".j2" / "features").mkdir(parents=True)
+    (tmp_path / ".j2" / "features" / "features.md").write_text(features)
+    tasks_done_dir = tmp_path / ".j2" / "tasks" / "done"
+    tasks_done_dir.mkdir(parents=True)
+    (tasks_done_dir / "F01.md").write_text("# Tasks for F01\n")
+
+    result = runner.missing_tasks_summary(tmp_path, SETTINGS_FOR_F23)
+
+    assert result == "none"
+
+
+def test_scaffold_tasks_done_dir_exists():
+    # scaffold/.j2/tasks/done/ must exist so rsync installs it in new projects.
+    assert (SCAFFOLD / ".j2" / "tasks" / "done").is_dir()
+
+
+def test_install_creates_tasks_done_dir(tmp_path):
+    # install.sh must create .j2/tasks/done/ in the target directory.
+    result = subprocess.run(
+        ["bash", str(SCAFFOLD / "install.sh"), str(tmp_path)],
+        capture_output=True, text=True
+    )
+    assert result.returncode == 0, result.stderr
+    assert (tmp_path / ".j2" / "tasks" / "done").is_dir()
+
+
+def test_prev_spec_gaps_reads_from_state_md(tmp_path):
+    # Should extract the integer from "N spec gaps" in state.md.
+    (tmp_path / ".j2").mkdir(parents=True)
+    (tmp_path / ".j2" / "state.md").write_text(
+        "completed: refreshed spec\nstate: 3 spec gaps | 2 features need tasks | 5 tasks pending\nnext: /refresh\n"
+    )
+    assert runner.prev_spec_gaps(tmp_path) == "3"
+
+
+def test_prev_spec_gaps_defaults_to_zero_when_missing(tmp_path):
+    # Missing state.md should return "0".
+    (tmp_path / ".j2").mkdir(parents=True)
+    assert runner.prev_spec_gaps(tmp_path) == "0"
+
+
+def test_prev_spec_gaps_defaults_to_zero_when_no_match(tmp_path):
+    # state.md without "N spec gaps" should return "0".
+    (tmp_path / ".j2").mkdir(parents=True)
+    (tmp_path / ".j2" / "state.md").write_text("completed: something\nnext: /task-next\n")
+    assert runner.prev_spec_gaps(tmp_path) == "0"
+
+
+def test_footer_contains_ordering_instructions():
+    # FOOTER must describe the three-rule priority order for the next: recommendation.
+    assert "spec gaps" in runner.FOOTER
+    assert "task files" in runner.FOOTER or "missing_tasks" in runner.FOOTER or "tasks-gen" in runner.FOOTER
+    assert "task-next" in runner.FOOTER
+
+
+# --- F16: /checkpoint command ---
+
+def make_checkpoint_project(tmp_path, features_text, state_text):
+    # Set up a minimal project for checkpoint rendering.
+    config_dir = tmp_path / ".j2" / "config"
+    config_dir.mkdir(parents=True)
+    settings = {"j2": {
+        "specs_dir": ".j2/specs",
+        "features_file": ".j2/features/features.md",
+        "tasks_dir": ".j2/tasks",
+        "templates_dir": ".j2/templates",
+        "rules_file": ".j2/rules.md",
+    }}
+    (config_dir / "settings.yaml").write_text(yaml.dump(settings))
+    workflow = {"steps": [{"id": "checkpoint", "template": "checkpoint.md"}]}
+    (config_dir / "workflow.yaml").write_text(yaml.dump(workflow))
+
+    features_dir = tmp_path / ".j2" / "features"
+    features_dir.mkdir(parents=True)
+    (features_dir / "features.md").write_text(features_text)
+
+    (tmp_path / ".j2" / "state.md").write_text(state_text)
+    (tmp_path / ".j2" / "rules.md").write_text("## Rules\n- Write tests.\n")
+
+    templates_dir = tmp_path / ".j2" / "templates"
+    templates_dir.mkdir(parents=True)
+    real_template = TEMPLATES_ROOT / "checkpoint.md"
+    (templates_dir / "checkpoint.md").write_text(real_template.read_text())
+
+    return tmp_path
+
+
+def test_checkpoint_renders_features_and_state(tmp_path):
+    # Checkpoint template must inject {{features}} and {{state}}.
+    state = "completed: finished F01\nstate: 0 spec gaps | 0 features need tasks | 3 tasks pending\nnext: /task-next\n"
+    root = make_checkpoint_project(tmp_path, FEATURES_TEXT, state)
+
+    settings = runner.load_config(root)
+    workflow = runner.load_workflow(root)
+    step = runner.find_step(workflow, "checkpoint")
+    template = runner.load_template(root, settings, step["template"])
+    placeholders = runner.find_placeholders(template)
+
+    class Args:
+        feature = task = request = None
+
+    context = runner.build_context(root, settings, placeholders, Args())
+    output = runner.fill_template(template, context)
+
+    assert "Directory Scaffold" in output   # from FEATURES_TEXT
+    assert "finished F01" in output         # from state.md
+    assert "{{features}}" not in output
+    assert "{{state}}" not in output
+
+
+def test_checkpoint_template_instructs_write_to_disk(tmp_path):
+    # Template must tell Claude to write current.md to disk.
+    template_path = TEMPLATES_ROOT / "checkpoint.md"
+    content = template_path.read_text()
+    assert "current.md" in content
+    assert "write" in content.lower() or "overwrite" in content.lower()
+
+
+def test_state_loader_reads_state_md(tmp_path):
+    # build_context state loader returns full contents of state.md.
+    (tmp_path / ".j2").mkdir(parents=True)
+    state_text = "completed: did something\nstate: 1 spec gaps | 0 features need tasks | 5 tasks pending\nnext: /refresh\n"
+    (tmp_path / ".j2" / "state.md").write_text(state_text)
+
+    settings = {"j2": {
+        "specs_dir": ".j2/specs",
+        "features_file": ".j2/features/features.md",
+        "tasks_dir": ".j2/tasks",
+        "templates_dir": ".j2/templates",
+        "rules_file": ".j2/rules.md",
+    }}
+
+    class Args:
+        feature = task = request = None
+
+    context = runner.build_context(tmp_path, settings, {"state"}, Args())
+    assert "did something" in context["state"]
+    assert "/refresh" in context["state"]
+
+
+# --- F17: /try command ---
+
+def make_try_project(tmp_path, features_text):
+    # Set up a minimal project for try rendering.
+    config_dir = tmp_path / ".j2" / "config"
+    config_dir.mkdir(parents=True)
+    settings = {"j2": {
+        "specs_dir": ".j2/specs",
+        "features_file": ".j2/features/features.md",
+        "tasks_dir": ".j2/tasks",
+        "templates_dir": ".j2/templates",
+        "rules_file": ".j2/rules.md",
+    }}
+    (config_dir / "settings.yaml").write_text(yaml.dump(settings))
+    workflow = {"steps": [{"id": "try", "template": "try.md"}]}
+    (config_dir / "workflow.yaml").write_text(yaml.dump(workflow))
+
+    features_dir = tmp_path / ".j2" / "features"
+    features_dir.mkdir(parents=True)
+    (features_dir / "features.md").write_text(features_text)
+
+    (tmp_path / ".j2" / "rules.md").write_text("## Rules\n- Write tests.\n")
+
+    templates_dir = tmp_path / ".j2" / "templates"
+    templates_dir.mkdir(parents=True)
+    real_template = TEMPLATES_ROOT / "try.md"
+    (templates_dir / "try.md").write_text(real_template.read_text())
+
+    return tmp_path
+
+
+def test_try_renders_features(tmp_path):
+    # Try template must inject {{features}} and include the rsync command.
+    root = make_try_project(tmp_path, FEATURES_TEXT)
+
+    settings = runner.load_config(root)
+    workflow = runner.load_workflow(root)
+    step = runner.find_step(workflow, "try")
+    template = runner.load_template(root, settings, step["template"])
+    placeholders = runner.find_placeholders(template)
+
+    class Args:
+        feature = task = request = None
+
+    context = runner.build_context(root, settings, placeholders, Args())
+    output = runner.fill_template(template, context)
+
+    assert "Directory Scaffold" in output   # from FEATURES_TEXT
+    assert "rsync" in output
+    assert "{{features}}" not in output
+
+
+def test_try_template_contains_verbatim_rsync():
+    # Template must have a literal rsync command with a bash date expression.
+    content = (TEMPLATES_ROOT / "try.md").read_text()
+    assert "rsync" in content
+    assert "$(date +" in content
+    assert "TIMESTAMP" not in content
+
+
+# --- F19: /deploy command ---
+
+def make_deploy_project(tmp_path, request_value):
+    # Set up a minimal project for deploy rendering.
+    config_dir = tmp_path / ".j2" / "config"
+    config_dir.mkdir(parents=True)
+    settings = {"j2": {
+        "specs_dir": ".j2/specs",
+        "features_file": ".j2/features/features.md",
+        "tasks_dir": ".j2/tasks",
+        "templates_dir": ".j2/templates",
+        "rules_file": ".j2/rules.md",
+    }}
+    (config_dir / "settings.yaml").write_text(yaml.dump(settings))
+    workflow = {"steps": [{"id": "deploy", "template": "deploy.md"}]}
+    (config_dir / "workflow.yaml").write_text(yaml.dump(workflow))
+    (tmp_path / ".j2" / "rules.md").write_text("## Rules\n- Write tests.\n")
+
+    templates_dir = tmp_path / ".j2" / "templates"
+    templates_dir.mkdir(parents=True)
+    real_template = TEMPLATES_ROOT / "deploy.md"
+    (templates_dir / "deploy.md").write_text(real_template.read_text())
+
+    return tmp_path
+
+
+def test_deploy_renders_with_provided_request(tmp_path):
+    # When request is provided, output must contain the target path and bash command.
+    root = make_deploy_project(tmp_path, "../my-project")
+
+    settings = runner.load_config(root)
+    workflow = runner.load_workflow(root)
+    step = runner.find_step(workflow, "deploy")
+    template = runner.load_template(root, settings, step["template"])
+
+    class Args:
+        feature = task = None
+        request = "../my-project"
+
+    placeholders = runner.find_placeholders(template)
+    context = runner.build_context(root, settings, placeholders, Args())
+    output = runner.fill_template(template, context)
+
+    assert "Target directory" in output
+    assert "../my-new-project" in output  # default shown in bare prompt
+    assert "mkdir" in output
+    assert "install.sh" in output
+
+
+def test_deploy_renders_with_empty_request_prompts_user(tmp_path):
+    # When request is empty, output must instruct Claude to ask the user.
+    root = make_deploy_project(tmp_path, "")
+
+    settings = runner.load_config(root)
+    workflow = runner.load_workflow(root)
+    step = runner.find_step(workflow, "deploy")
+    template = runner.load_template(root, settings, step["template"])
+
+    class Args:
+        feature = task = None
+        request = ""
+
+    placeholders = runner.find_placeholders(template)
+    context = runner.build_context(root, settings, placeholders, Args())
+    output = runner.fill_template(template, context)
+
+    assert "ask" in output.lower() or "my-new-project" in output
+
+
+# --- F20: prompt-with-default input pattern ---
+
+PROMPT_WITH_DEFAULT_TEMPLATES = [
+    "refine_features.md",
+    "gen_tasks.md",
+    "refine_tasks.md",
+    "start_task.md",
+    "deploy.md",
+]
+
+@pytest.mark.parametrize("tmpl", PROMPT_WITH_DEFAULT_TEMPLATES)
+def test_prompt_with_default_template_contains_ask_instruction(tmpl):
+    # Each affected template must instruct Claude to output a bare prompt and wait.
+    content = (TEMPLATES_ROOT / tmpl).read_text()
+    assert "stop and wait" in content.lower(), f"{tmpl} missing 'stop and wait' instruction"
+
+@pytest.mark.parametrize("tmpl", ["refine_tasks.md", "start_task.md", "gen_tasks.md"])
+def test_prompt_with_default_template_uses_features_not_feature(tmpl):
+    # Templates must use {{features}} (full list) instead of {{feature}} (pre-extracted section).
+    content = (TEMPLATES_ROOT / tmpl).read_text()
+    assert "{{features}}" in content, f"{tmpl} missing {{{{features}}}} placeholder"
+    assert "{{feature}}" not in content, f"{tmpl} still uses {{{{feature}}}}"
+
+@pytest.mark.parametrize("tmpl", ["refine_tasks.md", "start_task.md"])
+def test_prompt_with_default_template_drops_tasks_placeholder(tmpl):
+    # refine_tasks and start_task no longer pre-load a specific feature's tasks.
+    content = (TEMPLATES_ROOT / tmpl).read_text()
+    assert "{{tasks}}" not in content, f"{tmpl} still uses {{{{tasks}}}}"
+
+
+# --- F14: ROS2 configuration profile ---
+
+def test_ros2_settings_yaml_is_valid_and_has_required_keys():
+    # settings.ros2.yaml must be valid YAML with platform=ros2 and ros2 package/node keys.
+    import yaml
+    path = CONFIG_ROOT / "settings.ros2.yaml"
+    assert path.is_file(), "settings.ros2.yaml not found in .j2/config/"
+    data = yaml.safe_load(path.read_text())
+    assert data["project"]["platform"] == "ros2"
+    assert "package_type" in data["ros2"]
+    assert "node_type" in data["ros2"]
+
+
+@pytest.mark.parametrize("tmpl", ["gen_features.ros2.md", "gen_tasks.ros2.md"])
+def test_ros2_templates_exist_and_load(tmpl):
+    # ROS2 templates must exist and contain no unresolvable syntax errors.
+    path = TEMPLATES_ROOT / tmpl
+    assert path.is_file(), f"{tmpl} not found in .j2/templates/"
+    content = path.read_text()
+    assert len(content) > 0
+
+
+@pytest.mark.parametrize("tmpl", ["gen_features.ros2.md", "gen_tasks.ros2.md"])
+def test_ros2_templates_contain_ros2_guidance(tmpl):
+    # Each ROS2 template must mention key ROS2 concepts.
+    content = (TEMPLATES_ROOT / tmpl).read_text().lower()
+    assert "ros2" in content
+    assert "rclpy" in content or "rclcpp" in content
+
+
+# --- F25: completed features archive ---
+
+def test_milestone_template_instructs_feature_reorder():
+    # milestone.md must instruct Claude to move the feature entry to the completed section.
+    content = (TEMPLATES_ROOT / "milestone.md").read_text()
+    assert "completed section" in content.lower()
+    assert "incomplete section" in content.lower() or "incomplete features" in content.lower()

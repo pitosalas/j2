@@ -11,6 +11,12 @@ Write a concise `current.md` file capturing the state of the session. Include:
 Keep it short enough to scan in under a minute. This is a working note, not documentation.
 Output the content of `current.md` only — no explanation.
 
+After outputting the content, write it to `.j2/current.md`, overwriting any existing file.
+
+--- LAST STATE BEGIN ---
+{{state}}
+--- LAST STATE END ---
+
 --- FEATURES BEGIN ---
 {{features}}
 --- FEATURES END ---

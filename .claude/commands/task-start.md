@@ -1,1 +1,1 @@
-$(python3 .j2/runner.py task-start --feature $ARGUMENTS --root .)
+$(python3 .j2/runner.py task-start --root .)

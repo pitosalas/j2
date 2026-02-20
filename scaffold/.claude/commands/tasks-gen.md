@@ -1,1 +1,1 @@
-$(python3 scaffold/.j2/runner.py tasks-gen --feature $ARGUMENTS --root .)
+$(python3 .j2/runner.py tasks-gen --root .)

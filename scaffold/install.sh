@@ -33,9 +33,6 @@ fi
 echo "PyYAML ... OK"
 
 # --- Copy scaffold ---
-# NOTE: slash commands in scaffold/.claude/commands/ reference runner.py as ".j2/runner.py"
-# (the path in a user's installed project). The dev repo's .claude/commands/ uses
-# "scaffold/.j2/runner.py" instead. This difference is intentional — do not "fix" it.
 echo "Copying scaffold to $TARGET_DIR ..."
 rsync -a --ignore-existing \
   --exclude='__pycache__' \
@@ -43,6 +40,33 @@ rsync -a --ignore-existing \
   --exclude='.DS_Store' \
   "$SCRIPT_DIR/" "$TARGET_DIR/"
 echo "Scaffold copied."
+
+# --- Copy runner.py from j2 source repo ---
+RUNNER_SRC="$(dirname "$SCRIPT_DIR")/.j2/runner.py"
+if [ -f "$RUNNER_SRC" ]; then
+  cp "$RUNNER_SRC" "$TARGET_DIR/.j2/runner.py"
+  echo "runner.py installed."
+else
+  echo "WARNING: runner.py not found at $RUNNER_SRC — copy it manually to $TARGET_DIR/.j2/runner.py" >&2
+fi
+
+# --- Copy templates from j2 source repo ---
+TEMPLATES_SRC="$(dirname "$SCRIPT_DIR")/.j2/templates"
+if [ -d "$TEMPLATES_SRC" ]; then
+  rsync -a --ignore-existing "$TEMPLATES_SRC/" "$TARGET_DIR/.j2/templates/"
+  echo "Templates installed."
+else
+  echo "WARNING: templates not found at $TEMPLATES_SRC — copy them manually to $TARGET_DIR/.j2/templates/" >&2
+fi
+
+# --- Copy config from j2 source repo ---
+CONFIG_SRC="$(dirname "$SCRIPT_DIR")/.j2/config"
+if [ -d "$CONFIG_SRC" ]; then
+  rsync -a --ignore-existing "$CONFIG_SRC/" "$TARGET_DIR/.j2/config/"
+  echo "Config installed."
+else
+  echo "WARNING: config not found at $CONFIG_SRC — copy it manually to $TARGET_DIR/.j2/config/" >&2
+fi
 
 # --- Validate YAML configs ---
 echo "Validating config files..."

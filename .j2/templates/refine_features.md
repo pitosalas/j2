@@ -1,4 +1,8 @@
-You are helping a developer refine a feature list for a software project.
+Output ONLY the following line and nothing else, then stop and wait for the user's input:
+
+`Refinement request: `
+
+After the user responds, apply their requested changes to the feature list following the instructions below.
 
 The project coding rules are below. When applying changes, ensure the result stays consistent with these rules (e.g. if rules require tests, every feature must be testable).
 
@@ -29,6 +33,3 @@ If the requested changes imply a gap or contradiction in the spec (e.g. a new fe
 --- CURRENT FEATURES BEGIN ---
 {{features}}
 --- CURRENT FEATURES END ---
-
---- DEVELOPER REQUEST ---
-{{request}}

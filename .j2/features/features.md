@@ -7,6 +7,10 @@ Status values:
 
 ---
 
+<!-- ===== INCOMPLETE FEATURES (High → Medium → Low) ===== -->
+
+<!-- ===== COMPLETED FEATURES (High → Medium → Low) ===== -->
+
 ## F01 — Directory Structure Scaffold
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
@@ -72,22 +76,15 @@ Status values:
 
 ## F10 — `/milestone` Command
 **Priority**: High
-**Status**: not started | Tests written: no | Tests passing: n/a
-**Description**: Marks a feature as complete. Confirms implementation is done, tests are written and passing, and code is cleaned up. Summarizes what was completed and updates feature status. This is a quality gate, not just a snapshot.
-
----
-
-## F11 — Install Script
-**Priority**: Medium
 **Status**: done | Tests written: yes | Tests passing: yes
-**Description**: A `install.sh` shell script that verifies Python 3.10+, installs PyYAML if missing, creates the required `.j2/` directory structure, copies scaffold files using `rsync --ignore-existing` so existing user files are never overwritten, and validates YAML config files.
+**Description**: Marks a feature as complete. Confirms implementation is done, tests are written and passing, and code is cleaned up. Acts as a quality gate: if tests are missing or failing, the milestone is not granted. On success: moves the task file to `tasks/done/`, and moves the feature entry in `features.md` from the incomplete section to the completed section in priority order.
 
 ---
 
 ## F12 — Slash Command Registration
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Each slash command is a markdown file under `.claude/commands/` that invokes `runner.py` to render the appropriate template with injected context. Commands that require user input do not take inline parameters — instead the rendered prompt instructs Claude to ask the user, offering a recommended default answer.
+**Description**: Each slash command is a markdown file under `.claude/commands/` that invokes `runner.py` to render the appropriate template with injected context. Commands that require user input do not take inline parameters — instead the rendered prompt instructs Claude to output a bare prompt and wait for the user's answer.
 
 ---
 
@@ -98,31 +95,10 @@ Status values:
 
 ---
 
-## F14 — ROS2 Configuration Profile
-**Priority**: Low
-**Status**: not started | Tests written: no | Tests passing: n/a
-**Description**: A ROS2-specific configuration profile (YAML) and prompt templates that tailor feature and task generation for ROS2 packages, nodes, topics, and launch files.
-
----
-
 ## F15 — Principles File
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
 **Description**: A `.j2/rules.md` file holds user-defined coding principles (e.g. testing requirements, language version, style rules). The runner injects its contents into every template via `{{rules}}` at command time, so updating the file automatically propagates to all workflow steps. The scaffold ships a default `rules.md` that users customize for their project.
-
----
-
-## F16 — `/checkpoint` Command
-**Priority**: Medium
-**Status**: not started | Tests written: no | Tests passing: n/a
-**Description**: Saves current working context to `.j2/current.md` so the developer can resume later. Captures what is in progress, what was just completed, what is next, and any open questions. Unlike `/milestone`, this is not a quality gate — it can be run at any point during work.
-
----
-
-## F17 — `/try` Command
-**Priority**: Medium
-**Status**: not started | Tests written: no | Tests passing: n/a
-**Description**: Copies all project files into a timestamped snapshot directory (e.g., `snapshots/2026-02-20T0707/`) so the developer can play with and test the current state as if it were a standalone project, without affecting the working directory. No quality checks — just a raw snapshot for experimentation.
 
 ---
 
@@ -133,35 +109,77 @@ Status values:
 
 ---
 
-## F19 — `/deploy` Command
-**Priority**: Medium
-**Status**: not started | Tests written: no | Tests passing: n/a
-**Description**: Prompts the user for a target directory path (suggesting a sensible default). Creates that directory and runs `install.sh` on it to bootstrap a fresh j2 project. Used to deploy the scaffold from the dev repo to a new project.
-
----
-
-## F21 — `/next` Command
+## F21 — `/continue` Command
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Every command footer writes a structured state block to `.j2/state.md` containing: `completed:` (what was just done), `state:` (project health counts), and `next:` (recommended slash command). The `/next` command reads `next:` from `.j2/state.md` and executes it as if the user typed it, advancing the workflow with a single keystroke.
+**Description**: Every command footer writes a structured state block to `.j2/state.md` containing: `completed:` (what was just done), `state:` (project health counts), and `next:` (recommended slash command). The `/continue` command reads `next:` from `.j2/state.md` and executes it as if the user typed it, advancing the workflow with a single keystroke.
 
 ---
 
 ## F22 — Colored Structured Footer
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Every command ends with a color-highlighted footer using ANSI codes (or Claude Code markdown) containing three lines: `completed:` (one sentence — what was just done), `state:` (three counts: spec items without features / features without task files / tasks not yet run), and `next:` (the exact slash command to run next). The footer is visually distinct so it stands out from command output. These three values are also written to `.j2/state.md` for use by `/next`.
-
----
-
-## F20 — Prompt-with-Default Input Pattern
-**Priority**: Medium
-**Status**: not started | Tests written: no | Tests passing: n/a
-**Description**: Commands that require user input do not read from inline arguments. Instead, the prompt template instructs Claude to ask the user for the required value, offering a context-aware recommended default. Affected templates: `refine_features.md`, `gen_tasks.md`, `refine_tasks.md`, `start_task.md`, `deploy.md`.
+**Description**: Every command ends with a color-highlighted footer using ANSI codes (or Claude Code markdown) containing three lines: `completed:` (one sentence — what was just done), `state:` (three counts: spec items without features / features without task files / tasks not yet run), and `next:` (the exact slash command to run next). The footer is visually distinct so it stands out from command output. These three values are also written to `.j2/state.md` for use by `/continue`.
 
 ---
 
 ## F23 — Workflow-Ordered Next Step Logic
 **Priority**: High
-**Status**: not started | Tests written: no | Tests passing: n/a
+**Status**: done | Tests written: yes | Tests passing: yes
 **Description**: Every command's footer `next:` recommendation must follow a strict priority order: (1) if spec gaps exist, recommend `/refresh`; (2) else if any not-done feature (highest priority first) lacks a task file, recommend `/tasks-gen <feature-id>`; (3) else recommend `/task-next` to execute the first pending task in the highest-priority not-done feature. This ordering is enforced in the footer instructions appended by `runner.py` (the `FOOTER` constant) so every command automatically produces a correctly-ordered `next:` recommendation.
+
+---
+
+## F25 — Completed Features Archive
+**Priority**: Medium
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: After `/milestone` grants a feature complete, the feature's entry is moved from the incomplete section to the completed section of `.j2/features/features.md`, maintaining priority order (High → Medium → Low) within each section. The `/milestone` template instructs Claude to perform this reorder as part of granting the milestone.
+
+---
+
+## F11 — Install Script
+**Priority**: Medium
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: A `install.sh` shell script that verifies Python 3.10+, installs PyYAML if missing, creates the required `.j2/` directory structure, copies scaffold files using `rsync --ignore-existing` so existing user files are never overwritten, and validates YAML config files.
+
+---
+
+## F16 — `/checkpoint` Command
+**Priority**: Medium
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Saves current working context to `.j2/current.md` so the developer can resume later. Captures what is in progress, what was just completed, what is next, and any open questions. Unlike `/milestone`, this is not a quality gate — it can be run at any point during work.
+
+---
+
+## F17 — `/try` Command
+**Priority**: Medium
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Copies all project files into a timestamped snapshot directory (e.g., `snapshots/2026-02-20T0707/`) so the developer can play with and test the current state as if it were a standalone project, without affecting the working directory. No quality checks — just a raw snapshot for experimentation.
+
+---
+
+## F19 — `/deploy` Command
+**Priority**: Medium
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Prompts the user for a target directory path (suggesting a sensible default). Creates that directory and runs `install.sh` on it to bootstrap a fresh j2 project. Used to deploy the scaffold from the dev repo to a new project.
+
+---
+
+## F20 — Prompt-with-Default Input Pattern
+**Priority**: Medium
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Commands that require user input output a bare prompt line and wait, rather than generating prose. The default value is pre-computed by the runner and injected via `{{default_feature}}`. Affected templates: `refine_features.md`, `gen_tasks.md`, `refine_tasks.md`, `start_task.md`, `deploy.md`.
+
+---
+
+## F24 — Completed Tasks Archive
+**Priority**: Medium
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: After `/milestone` grants a feature complete, the feature's task file (`.j2/tasks/<feature-id>.md`) is moved to `.j2/tasks/done/<feature-id>.md`. This keeps the active tasks directory focused on pending work. The runner's `missing_tasks_summary` function checks both `.j2/tasks/` and `.j2/tasks/done/` so archived features are not re-flagged as missing task files. The scaffold ships with the `tasks/done/` directory pre-created.
+
+---
+
+## F14 — ROS2 Configuration Profile
+**Priority**: Low
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: A ROS2-specific configuration profile (YAML) and prompt templates that tailor feature and task generation for ROS2 packages, nodes, topics, and launch files.
