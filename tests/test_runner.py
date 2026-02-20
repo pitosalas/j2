@@ -1,5 +1,6 @@
 """Tests for scaffold/.j2/runner.py"""
 
+import subprocess
 import sys
 from pathlib import Path
 
@@ -70,12 +71,12 @@ def test_fill_template_multiple_keys():
 # --- find_step ---
 
 WORKFLOW = [
-    {"id": "spec-review", "template": "spec_review.md"},
-    {"id": "gen-features", "template": "gen_features.md"},
+    {"id": "refresh", "template": "refresh.md"},
+    {"id": "features-gen", "template": "gen_features.md"},
 ]
 
 def test_find_step_returns_correct_step():
-    step = runner.find_step(WORKFLOW, "gen-features")
+    step = runner.find_step(WORKFLOW, "features-gen")
     assert step["template"] == "gen_features.md"
 
 def test_find_step_raises_for_unknown():
@@ -130,10 +131,10 @@ def test_load_config(tmp_path):
 def test_load_workflow(tmp_path):
     config_dir = tmp_path / ".j2" / "config"
     config_dir.mkdir(parents=True)
-    workflow = {"steps": [{"id": "spec-review", "template": "spec_review.md"}]}
+    workflow = {"steps": [{"id": "refresh", "template": "refresh.md"}]}
     (config_dir / "workflow.yaml").write_text(yaml.dump(workflow))
     result = runner.load_workflow(tmp_path)
-    assert result[0]["id"] == "spec-review"
+    assert result[0]["id"] == "refresh"
 
 def test_load_config_missing_file(tmp_path):
     with pytest.raises(FileNotFoundError):
@@ -156,7 +157,7 @@ def make_temp_project(tmp_path, spec_text, rules_text):
         "rules_file": ".j2/rules.md",
     }}
     (config_dir / "settings.yaml").write_text(yaml.dump(settings))
-    workflow = {"steps": [{"id": "gen-features", "template": "gen_features.md"}]}
+    workflow = {"steps": [{"id": "features-gen", "template": "gen_features.md"}]}
     (config_dir / "workflow.yaml").write_text(yaml.dump(workflow))
 
     specs_dir = tmp_path / ".j2" / "specs"
@@ -180,7 +181,7 @@ def test_gen_features_renders_spec_and_rules(tmp_path):
 
     settings = runner.load_config(root)
     workflow = runner.load_workflow(root)
-    step = runner.find_step(workflow, "gen-features")
+    step = runner.find_step(workflow, "features-gen")
     template = runner.load_template(root, settings, step["template"])
     placeholders = runner.find_placeholders(template)
 
@@ -193,6 +194,61 @@ def test_gen_features_renders_spec_and_rules(tmp_path):
     assert "My Project" in output
     assert "tracks widgets" in output
     assert "All features need tests" in output
+    assert "{{spec}}" not in output
+    assert "{{rules}}" not in output
+
+
+# --- F04: /refresh command ---
+
+def make_refresh_project(tmp_path, spec_text, rules_text):
+    # Set up a minimal project for refresh rendering.
+    config_dir = tmp_path / ".j2" / "config"
+    config_dir.mkdir(parents=True)
+    settings = {"j2": {
+        "specs_dir": ".j2/specs",
+        "features_file": ".j2/features/features.md",
+        "tasks_dir": ".j2/tasks",
+        "templates_dir": ".j2/templates",
+        "rules_file": ".j2/rules.md",
+    }}
+    (config_dir / "settings.yaml").write_text(yaml.dump(settings))
+    workflow = {"steps": [{"id": "refresh", "template": "refresh.md"}]}
+    (config_dir / "workflow.yaml").write_text(yaml.dump(workflow))
+
+    specs_dir = tmp_path / ".j2" / "specs"
+    specs_dir.mkdir(parents=True)
+    (specs_dir / "spec.md").write_text(spec_text)
+
+    (tmp_path / ".j2" / "rules.md").write_text(rules_text)
+
+    templates_dir = tmp_path / ".j2" / "templates"
+    templates_dir.mkdir(parents=True)
+    real_template = SCAFFOLD_ROOT / ".j2" / "templates" / "refresh.md"
+    (templates_dir / "refresh.md").write_text(real_template.read_text())
+
+    return tmp_path
+
+
+def test_refresh_renders_spec_and_rules(tmp_path):
+    spec = "# Widget Tracker\nTracks widgets in real time."
+    rules = "## Testing\n- Every feature needs a test."
+    root = make_refresh_project(tmp_path, spec, rules)
+
+    settings = runner.load_config(root)
+    workflow = runner.load_workflow(root)
+    step = runner.find_step(workflow, "refresh")
+    template = runner.load_template(root, settings, step["template"])
+    placeholders = runner.find_placeholders(template)
+
+    class Args:
+        feature = task = request = None
+
+    context = runner.build_context(root, settings, placeholders, Args())
+    output = runner.fill_template(template, context)
+
+    assert "Widget Tracker" in output
+    assert "Tracks widgets" in output
+    assert "Every feature needs a test" in output
     assert "{{spec}}" not in output
     assert "{{rules}}" not in output
 
@@ -211,7 +267,7 @@ def make_start_task_project(tmp_path, spec_text, rules_text, features_text, task
         "rules_file": ".j2/rules.md",
     }}
     (config_dir / "settings.yaml").write_text(yaml.dump(settings))
-    workflow = {"steps": [{"id": "start-task", "template": "start_task.md"}]}
+    workflow = {"steps": [{"id": "task-start", "template": "start_task.md"}]}
     (config_dir / "workflow.yaml").write_text(yaml.dump(workflow))
 
     (tmp_path / ".j2" / "specs").mkdir(parents=True)
@@ -244,13 +300,13 @@ def test_start_task_renders_all_placeholders(tmp_path):
 
     settings = runner.load_config(root)
     workflow = runner.load_workflow(root)
-    step = runner.find_step(workflow, "start-task")
+    step = runner.find_step(workflow, "task-start")
     template = runner.load_template(root, settings, step["template"])
     placeholders = runner.find_placeholders(template)
 
     class Args:
         feature = "F01"
-        task = "T01"
+        task = None
         request = None
 
     context = runner.build_context(root, settings, placeholders, Args())
@@ -263,7 +319,7 @@ def test_start_task_renders_all_placeholders(tmp_path):
     assert "{{spec}}" not in output
     assert "{{rules}}" not in output
     assert "{{feature}}" not in output
-    assert "{{task}}" not in output
+    assert "{{tasks}}" not in output
 
 
 # --- F08: /refine-tasks command ---
@@ -280,7 +336,7 @@ def make_refine_tasks_project(tmp_path, tasks_text, rules_text, feature_id):
         "rules_file": ".j2/rules.md",
     }}
     (config_dir / "settings.yaml").write_text(yaml.dump(settings))
-    workflow = {"steps": [{"id": "refine-tasks", "template": "refine_tasks.md"}]}
+    workflow = {"steps": [{"id": "tasks-refine", "template": "refine_tasks.md"}]}
     (config_dir / "workflow.yaml").write_text(yaml.dump(workflow))
 
     tasks_dir = tmp_path / ".j2" / "tasks"
@@ -306,7 +362,7 @@ def test_refine_tasks_renders_tasks_rules_and_request(tmp_path):
 
     settings = runner.load_config(root)
     workflow = runner.load_workflow(root)
-    step = runner.find_step(workflow, "refine-tasks")
+    step = runner.find_step(workflow, "tasks-refine")
     template = runner.load_template(root, settings, step["template"])
     placeholders = runner.find_placeholders(template)
 
@@ -340,7 +396,7 @@ def make_gen_tasks_project(tmp_path, spec_text, rules_text, features_text):
         "rules_file": ".j2/rules.md",
     }}
     (config_dir / "settings.yaml").write_text(yaml.dump(settings))
-    workflow = {"steps": [{"id": "gen-tasks", "template": "gen_tasks.md"}]}
+    workflow = {"steps": [{"id": "tasks-gen", "template": "gen_tasks.md"}]}
     (config_dir / "workflow.yaml").write_text(yaml.dump(workflow))
 
     (tmp_path / ".j2" / "specs").mkdir(parents=True)
@@ -368,7 +424,7 @@ def test_gen_tasks_renders_spec_rules_and_feature(tmp_path):
 
     settings = runner.load_config(root)
     workflow = runner.load_workflow(root)
-    step = runner.find_step(workflow, "gen-tasks")
+    step = runner.find_step(workflow, "tasks-gen")
     template = runner.load_template(root, settings, step["template"])
     placeholders = runner.find_placeholders(template)
 
@@ -401,7 +457,7 @@ def make_refine_features_project(tmp_path, features_text, rules_text):
         "rules_file": ".j2/rules.md",
     }}
     (config_dir / "settings.yaml").write_text(yaml.dump(settings))
-    workflow = {"steps": [{"id": "refine-features", "template": "refine_features.md"}]}
+    workflow = {"steps": [{"id": "features-refine", "template": "refine_features.md"}]}
     (config_dir / "workflow.yaml").write_text(yaml.dump(workflow))
 
     features_dir = tmp_path / ".j2" / "features"
@@ -426,7 +482,7 @@ def test_refine_features_renders_features_rules_and_request(tmp_path):
 
     settings = runner.load_config(root)
     workflow = runner.load_workflow(root)
-    step = runner.find_step(workflow, "refine-features")
+    step = runner.find_step(workflow, "features-refine")
     template = runner.load_template(root, settings, step["template"])
     placeholders = runner.find_placeholders(template)
 
@@ -450,7 +506,7 @@ def test_refine_features_renders_features_rules_and_request(tmp_path):
 TEMPLATES_DIR = Path(__file__).parent.parent / "scaffold" / ".j2" / "templates"
 TEMPLATES_REQUIRING_RULES = [
     "gen_features.md", "gen_tasks.md", "refine_features.md", "refine_tasks.md",
-    "start_task.md", "next_task.md", "milestone.md", "spec_review.md",
+    "start_task.md", "next_task.md", "milestone.md", "refresh.md",
 ]
 
 def test_scaffold_rules_md_exists_and_nonempty():
@@ -478,8 +534,8 @@ SCAFFOLD_ROOT = Path(__file__).parent.parent / "scaffold"
 
 REQUIRED_SETTINGS_KEYS = ["specs_dir", "features_file", "tasks_dir", "templates_dir", "rules_file"]
 EXPECTED_COMMANDS = [
-    "spec-review", "gen-features", "refine-features", "gen-tasks", "refine-tasks",
-    "start-task", "next-task", "try", "checkpoint", "milestone",
+    "refresh", "features-gen", "features-refine", "tasks-gen", "tasks-refine",
+    "task-start", "task-next", "try", "checkpoint", "milestone", "deploy",
 ]
 
 def test_settings_yaml_has_required_j2_keys():
@@ -521,6 +577,178 @@ def test_scaffold_required_dirs_exist(rel):
 
 def test_scaffold_install_script_exists():
     assert (SCAFFOLD / "install.sh").is_file()
+
+
+def test_install_creates_required_dirs(tmp_path):
+    # Running install.sh should create the expected directory structure.
+    result = subprocess.run(
+        ["bash", str(SCAFFOLD / "install.sh"), str(tmp_path)],
+        capture_output=True, text=True
+    )
+    assert result.returncode == 0, result.stderr
+    for rel in [".j2/config", ".j2/templates", ".j2/specs", ".claude/commands"]:
+        assert (tmp_path / rel).is_dir(), f"{rel} missing after install"
+
+
+def test_install_copies_scaffold_files(tmp_path):
+    # Key scaffold files should be present in the target after install.
+    subprocess.run(["bash", str(SCAFFOLD / "install.sh"), str(tmp_path)], check=True)
+    assert (tmp_path / ".j2" / "config" / "workflow.yaml").is_file()
+    assert (tmp_path / ".j2" / "config" / "settings.yaml").is_file()
+    assert (tmp_path / ".claude" / "commands" / "refresh.md").is_file()
+
+
+def test_install_does_not_overwrite_existing_file(tmp_path):
+    # Re-running install.sh must not overwrite a file the user has customised.
+    subprocess.run(["bash", str(SCAFFOLD / "install.sh"), str(tmp_path)], check=True)
+    sentinel = tmp_path / ".j2" / "rules.md"
+    original = sentinel.read_text()
+    sentinel.write_text("custom content")
+    subprocess.run(["bash", str(SCAFFOLD / "install.sh"), str(tmp_path)], check=True)
+    assert sentinel.read_text() == "custom content", "install.sh overwrote an existing file"
+
+
+# --- F18: /task-next command ---
+
+def make_task_next_project(tmp_path, spec_text, rules_text, features_text):
+    # Set up a minimal project for task-next rendering.
+    config_dir = tmp_path / ".j2" / "config"
+    config_dir.mkdir(parents=True)
+    settings = {"j2": {
+        "specs_dir": ".j2/specs",
+        "features_file": ".j2/features/features.md",
+        "tasks_dir": ".j2/tasks",
+        "templates_dir": ".j2/templates",
+        "rules_file": ".j2/rules.md",
+    }}
+    (config_dir / "settings.yaml").write_text(yaml.dump(settings))
+    workflow = {"steps": [{"id": "task-next", "template": "next_task.md"}]}
+    (config_dir / "workflow.yaml").write_text(yaml.dump(workflow))
+
+    specs_dir = tmp_path / ".j2" / "specs"
+    specs_dir.mkdir(parents=True)
+    (specs_dir / "spec.md").write_text(spec_text)
+
+    (tmp_path / ".j2" / "rules.md").write_text(rules_text)
+
+    features_dir = tmp_path / ".j2" / "features"
+    features_dir.mkdir(parents=True)
+    (features_dir / "features.md").write_text(features_text)
+
+    templates_dir = tmp_path / ".j2" / "templates"
+    templates_dir.mkdir(parents=True)
+    real_template = SCAFFOLD_ROOT / ".j2" / "templates" / "next_task.md"
+    (templates_dir / "next_task.md").write_text(real_template.read_text())
+
+    return tmp_path
+
+
+def test_task_next_renders_rules_spec_and_features(tmp_path):
+    spec = "# Widget App\nTracks widgets in real time."
+    rules = "## Testing\n- Every feature needs a test."
+    root = make_task_next_project(tmp_path, spec, rules, FEATURES_TEXT)
+
+    settings = runner.load_config(root)
+    workflow = runner.load_workflow(root)
+    step = runner.find_step(workflow, "task-next")
+    template = runner.load_template(root, settings, step["template"])
+    placeholders = runner.find_placeholders(template)
+
+    class Args:
+        feature = task = request = None
+
+    context = runner.build_context(root, settings, placeholders, Args())
+    output = runner.fill_template(template, context)
+
+    assert "Widget App" in output
+    assert "Every feature needs a test" in output
+    assert "Directory Scaffold" in output  # from FEATURES_TEXT
+    assert "{{rules}}" not in output
+    assert "{{spec}}" not in output
+    assert "{{features}}" not in output
+
+
+# --- F22: colored structured footer ---
+
+def test_footer_contains_ansi_color_codes():
+    # All three labels must be ANSI-colored.
+    assert "\033[32mcompleted:" in runner.FOOTER
+    assert "\033[33mstate:" in runner.FOOTER
+    assert "\033[36mnext:" in runner.FOOTER
+
+
+def test_footer_instructs_state_md_write():
+    # Footer must tell Claude to write state.md.
+    assert "state.md" in runner.FOOTER
+    assert "without ANSI" in runner.FOOTER
+
+
+# --- footer in rendered output ---
+
+def test_rendered_output_contains_state_and_next_footer(tmp_path):
+    spec = "# My Project\nThis app tracks widgets."
+    rules = "## Testing\n- All features need tests."
+    root = make_temp_project(tmp_path, spec, rules)
+
+    settings = runner.load_config(root)
+    workflow = runner.load_workflow(root)
+    step = runner.find_step(workflow, "features-gen")
+    template = runner.load_template(root, settings, step["template"])
+    placeholders = runner.find_placeholders(template)
+
+    class Args:
+        feature = task = request = None
+
+    context = runner.build_context(root, settings, placeholders, Args())
+    output = runner.fill_template(template, context) + runner.FOOTER
+
+    assert "completed:" in output
+    assert "state:" in output
+    assert "next:" in output
+
+
+# --- F21: /next command ---
+
+def test_resolve_next_command_bare(tmp_path):
+    # A state.md with a bare next command should set args.command correctly.
+    (tmp_path / ".j2").mkdir(parents=True)
+    (tmp_path / ".j2" / "state.md").write_text("completed: something\nstate: 0 | 0 | 0\nnext: /task-next\n")
+
+    class Args:
+        command = "next"
+        feature = None
+
+    args = Args()
+    runner.resolve_next_command(tmp_path, args)
+    assert args.command == "task-next"
+    assert args.feature is None
+
+
+def test_resolve_next_command_with_feature(tmp_path):
+    # A state.md with a feature arg should also set args.feature.
+    (tmp_path / ".j2").mkdir(parents=True)
+    (tmp_path / ".j2" / "state.md").write_text("completed: something\nstate: 0 | 0 | 0\nnext: /tasks-gen F11\n")
+
+    class Args:
+        command = "next"
+        feature = None
+
+    args = Args()
+    runner.resolve_next_command(tmp_path, args)
+    assert args.command == "tasks-gen"
+    assert args.feature == "F11"
+
+
+def test_resolve_next_command_missing_state(tmp_path):
+    # Missing state.md should raise ValueError or FileNotFoundError.
+    (tmp_path / ".j2").mkdir(parents=True)
+
+    class Args:
+        command = "next"
+        feature = None
+
+    with pytest.raises((ValueError, FileNotFoundError)):
+        runner.resolve_next_command(tmp_path, Args())
 
 
 # --- build_context graceful fallback ---

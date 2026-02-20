@@ -6,6 +6,12 @@ The project coding rules are below. When applying changes, ensure the result sta
 {{rules}}
 --- RULES END ---
 
+The current project spec is below for reference.
+
+--- SPEC BEGIN ---
+{{spec}}
+--- SPEC END ---
+
 The current feature list is below. The developer may ask you to:
 - Add a new feature
 - Remove a feature
@@ -17,6 +23,8 @@ The current feature list is below. The developer may ask you to:
 Apply the requested changes and output the complete updated feature list in the same format.
 Preserve the status values legend at the top of the output exactly as it appears in the input.
 Do not make changes beyond what was requested.
+
+If the requested changes imply a gap or contradiction in the spec (e.g. a new feature requires something the spec doesn't mention), output an updated spec in a fenced code block after the feature list. If no spec update is needed, omit it entirely.
 
 --- CURRENT FEATURES BEGIN ---
 {{features}}

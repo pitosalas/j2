@@ -24,49 +24,49 @@ Status values:
 ## F03 — Prompt Template System
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Each workflow step has a Markdown prompt template stored in `.j2/templates/`. Templates use placeholders (e.g., `{{spec}}`, `{{features}}`, `{{rules}}`) that are filled in at runtime before being sent to Claude.
+**Description**: Each workflow step has a Markdown prompt template stored in `.j2/templates/`. Templates use `{{placeholder}}` tokens (e.g. `{{spec}}`, `{{features}}`, `{{rules}}`) that are filled in at runtime before being sent to Claude.
 
 ---
 
-## F04 — `/spec-review` Command
-**Priority**: Medium
-**Status**: not started | Tests written: no | Tests passing: n/a
-**Description**: Reads all files in `.j2/specs/`, prints a summary and clarifying questions to stdout, then offers to make changes to the spec based on the user's response.
-
----
-
-## F05 — `/gen-features` Command
+## F04 — `/refresh` Command
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Reads the spec and generates a numbered feature list with name, description, and priority. Output is written to `.j2/features/features.md`.
+**Description**: Reads all files in `.j2/specs/`, summarizes the project, surfaces clarifying questions each paired with a suggested answer, then rewrites the spec incorporating those answers and presents it in a fenced code block.
 
 ---
 
-## F06 — `/refine-features` Command
+## F05 — `/features-gen` Command
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Presents the current feature list and allows the user to iteratively add, remove, or reprioritize features with Claude's help. Updates `features.md` in place.
+**Description**: Reads the spec and creates or updates the numbered feature list in `.j2/features/features.md`. If a feature list already exists, updates it rather than replacing it wholesale — preserving existing status values and adding or revising entries as needed.
 
 ---
 
-## F07 — `/gen-tasks` Command
+## F06 — `/features-refine` Command
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Takes a feature identifier and generates a task breakdown for that feature with concrete, actionable development steps. Output is stored at `.j2/tasks/<feature-name>.md`. Run once per feature.
+**Description**: Prompts the user for a refinement request (e.g. "Add a caching feature"), offering a context-aware suggested default based on the current feature list. Applies the change and outputs the complete updated feature list. If the change implies a spec gap, also outputs an updated spec.
 
 ---
 
-## F08 — `/refine-tasks` Command
+## F07 — `/tasks-gen` Command
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Presents the task list for a specified feature and allows iterative refinement. Updates the relevant task file in place.
+**Description**: Prompts the user for a feature ID, suggesting the first not-started feature as the default. Generates a task breakdown for that feature and stores it at `.j2/tasks/<feature-id>.md`.
 
 ---
 
-## F09 — `/start-task` Command
+## F08 — `/tasks-refine` Command
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Takes a feature name and task identifier, reads the task description, and begins implementation. Claude writes code for the specified task.
+**Description**: Prompts the user for a feature ID and a refinement request, offering sensible defaults. Applies the changes to that feature's task list.
+
+---
+
+## F09 — `/task-start` Command
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Prompts the user for a feature ID, suggesting the first in-progress or not-started feature as the default. Finds the first not-started task in that feature and implements it.
 
 ---
 
@@ -79,15 +79,15 @@ Status values:
 
 ## F11 — Install Script
 **Priority**: Medium
-**Status**: in progress | Tests written: no | Tests passing: n/a
-**Description**: A `install.sh` shell script that verifies Python 3.10+, creates the directory structure, copies template files and slash command definitions, and validates YAML configuration.
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: A `install.sh` shell script that verifies Python 3.10+, installs PyYAML if missing, creates the required `.j2/` directory structure, copies scaffold files using `rsync --ignore-existing` so existing user files are never overwritten, and validates YAML config files.
 
 ---
 
 ## F12 — Slash Command Registration
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Each slash command is a markdown file under `.claude/commands/` that invokes `runner.py` to render the appropriate template with injected context and call Claude exactly once.
+**Description**: Each slash command is a markdown file under `.claude/commands/` that invokes `runner.py` to render the appropriate template with injected context. Commands that require user input do not take inline parameters — instead the rendered prompt instructs Claude to ask the user, offering a recommended default answer.
 
 ---
 
@@ -122,13 +122,39 @@ Status values:
 ## F17 — `/try` Command
 **Priority**: Medium
 **Status**: not started | Tests written: no | Tests passing: n/a
-**Description**: Copies all project files into a timestamped snapshot directory (e.g., `snapshots/2026-02-18T1045/`) so the developer can play with and test the current state as if it were a standalone project, without affecting the working directory. No quality checks — just a raw snapshot for experimentation.
+**Description**: Copies all project files into a timestamped snapshot directory (e.g., `snapshots/2026-02-20T0707/`) so the developer can play with and test the current state as if it were a standalone project, without affecting the working directory. No quality checks — just a raw snapshot for experimentation.
 
 ---
 
-## F18 — `/next-task` Command
+## F18 — `/task-next` Command
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Takes no arguments and prompts for none. Automatically determines the logical next task by scanning the feature list for the first in-progress or not-started feature, then finding the first not-started task within it, and begins implementation. Exits with a clear error if no logical next task can be determined.
+
+---
+
+## F19 — `/deploy` Command
+**Priority**: Medium
+**Status**: not started | Tests written: no | Tests passing: n/a
+**Description**: Prompts the user for a target directory path (suggesting a sensible default). Creates that directory and runs `install.sh` on it to bootstrap a fresh j2 project. Used to deploy the scaffold from the dev repo to a new project.
+
+---
+
+## F21 — `/next` Command
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Every command footer writes a structured state block to `.j2/state.md` containing: `completed:` (what was just done), `state:` (project health counts), and `next:` (recommended slash command). The `/next` command reads `next:` from `.j2/state.md` and executes it as if the user typed it, advancing the workflow with a single keystroke.
+
+---
+
+## F22 — Colored Structured Footer
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Every command ends with a color-highlighted footer using ANSI codes (or Claude Code markdown) containing three lines: `completed:` (one sentence — what was just done), `state:` (three counts: spec items without features / features without task files / tasks not yet run), and `next:` (the exact slash command to run next). The footer is visually distinct so it stands out from command output. These three values are also written to `.j2/state.md` for use by `/next`.
+
+---
+
+## F20 — Prompt-with-Default Input Pattern
 **Priority**: High
 **Status**: not started | Tests written: no | Tests passing: n/a
-**Description**: Like `/start-task` but takes no arguments. Automatically determines the logical next task by scanning the feature list for the first in-progress or not-started feature, then finding the first not-started task within it, and begins implementation. Exits with a clear error if no logical next task can be determined (all done, or no task files exist).
-
----
+**Description**: Commands that require user input do not read from inline arguments. Instead, the prompt template instructs Claude to ask the user for the required value, offering a context-aware recommended default. Affected templates: `refine_features.md`, `gen_tasks.md`, `refine_tasks.md`, `start_task.md`, `deploy.md`.

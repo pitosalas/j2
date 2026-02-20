@@ -10,7 +10,8 @@ Read the following project specification and:
 1. Write a concise summary (3-5 sentences) of what the project is and what it does.
 2. List any ambiguities, gaps, or contradictions in the spec.
 3. Note any conflicts between the spec and the coding rules above.
-4. Write a short list of clarifying questions the developer should answer before proceeding.
+4. For each clarifying question, write it out and immediately follow it with your suggested answer — a concrete, reasonable default the developer can accept or override.
+5. Rewrite the full spec incorporating your suggested answers. Present the updated spec in a fenced code block so the developer can copy it directly. Do not ask for approval first — just produce the updated spec.
 
 Keep your response focused and practical.
 

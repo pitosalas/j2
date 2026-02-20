@@ -5,16 +5,17 @@ from pathlib import Path
 COMMANDS_DIR = Path(__file__).parent.parent / "scaffold" / ".claude" / "commands"
 
 EXPECTED_COMMANDS = [
-    "spec-review",
-    "gen-features",
-    "refine-features",
-    "gen-tasks",
-    "refine-tasks",
-    "start-task",
-    "next-task",
+    "refresh",
+    "features-gen",
+    "features-refine",
+    "tasks-gen",
+    "tasks-refine",
+    "task-start",
+    "task-next",
     "try",
     "checkpoint",
     "milestone",
+    "deploy",
 ]
 
 
@@ -51,31 +52,31 @@ def test_each_command_passes_correct_id():
 
 # --- argument wiring ---
 
-def test_refine_features_passes_arguments_as_request():
-    content = command_content("refine-features")
+def test_features_refine_passes_arguments_as_request():
+    content = command_content("features-refine")
     assert "--request" in content
     assert "$ARGUMENTS" in content
 
-def test_gen_tasks_passes_arguments_as_feature():
-    content = command_content("gen-tasks")
+def test_tasks_gen_passes_arguments_as_feature():
+    content = command_content("tasks-gen")
     assert "--feature" in content
     assert "$ARGUMENTS" in content
 
-def test_refine_tasks_splits_feature_and_request():
-    content = command_content("refine-tasks")
+def test_tasks_refine_splits_feature_and_request():
+    content = command_content("tasks-refine")
     assert "--feature" in content
     assert "--request" in content
     assert "$ARGUMENTS" in content
 
-def test_start_task_splits_feature_and_task():
-    content = command_content("start-task")
+def test_task_start_passes_feature_argument():
+    content = command_content("task-start")
     assert "--feature" in content
-    assert "--task" in content
+    assert "--task" not in content
     assert "$ARGUMENTS" in content
 
 def test_no_arg_commands_have_no_arguments_placeholder():
     # Commands that take no arguments should not reference $ARGUMENTS.
-    for name in ("spec-review", "gen-features", "next-task", "try", "checkpoint", "milestone"):
+    for name in ("refresh", "features-gen", "task-next", "try", "checkpoint", "milestone"):
         content = command_content(name)
         assert "$ARGUMENTS" not in content, \
             f"{name}.md unexpectedly references $ARGUMENTS"

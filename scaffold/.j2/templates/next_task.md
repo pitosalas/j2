@@ -16,20 +16,26 @@ Follow these coding rules exactly:
 
 ## Instructions
 
-1. Find the next task to work on:
-   - Look for a feature with **Status**: `in progress` first. If found, use it.
-   - Otherwise use the first feature with **Status**: `not started` that has High priority.
+1. **Check for features without task files first.**
+   Scan all features that are not `done`. For each, check whether `.j2/tasks/<feature-id>.md` exists.
+   If any not-done feature is missing its task file, stop immediately and tell the user:
+   > No task file found for <feature-id>. Run `/tasks-gen <feature-id>` before continuing.
+   Do not proceed to step 2.
+
+2. **Find the next feature to work on** (only reached if all not-done features have task files):
+   - Look for a feature with **Status**: `in progress` first.
+   - Otherwise use the first feature with **Status**: `not started`, highest priority first.
    - Skip features marked `done`.
 
-2. Read the task file for that feature from `.j2/tasks/<feature-id>.md`.
-   If no task file exists yet, tell the user to run `/gen-tasks <feature-id>` first.
-
-3. Find the first task in that file that has not been implemented yet.
-   If all tasks appear done, tell the user and suggest running `/milestone`.
+3. **Find the first not-started task** in that feature's task file.
+   - If all tasks in the file are `done`, suggest running `/milestone <feature-id>` and stop.
+   - If no not-started tasks exist anywhere across all features, output:
+     > No pending tasks found. All features may be complete — consider running `/milestone`.
+     Then stop.
 
 4. Implement that task. Follow the rules above. Write clean, working code.
 
 5. After implementing, briefly state:
    - Which feature and task you worked on (e.g. F02 / T03)
    - What you built
-   - What the developer should do next (run tests, then `/next-task` again, or `/milestone` if the feature is complete)
+   - What the developer should do next (run tests, then `/task-next` again, or `/milestone` if the feature is complete)

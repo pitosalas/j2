@@ -1,15 +1,15 @@
-You are helping a developer implement a specific task in a software project.
+You are helping a developer implement the next pending task for a feature.
 
-Read the task description carefully, then implement it. You must follow the coding principles below exactly.
+Find the first task in the task list whose `**Status**` is `not started` and implement it. You must follow the coding principles below exactly.
 
 --- PRINCIPLES BEGIN ---
 {{rules}}
 --- PRINCIPLES END ---
 
 After writing the code:
-1. Update the task's `**Status**` to `done` in the task file.
+1. Update that task's `**Status**` to `done` in the task file.
 2. Briefly explain what you implemented and any decisions you made.
-3. State what the developer should do next (run tests, then `/next-task` or `/milestone` if the feature is complete).
+3. State what the developer should do next (run tests, then `/task-start` again or `/milestone` if the feature is complete).
 
 --- SPEC BEGIN ---
 {{spec}}
@@ -19,6 +19,6 @@ After writing the code:
 {{feature}}
 --- FEATURE END ---
 
---- TASK BEGIN ---
-{{task}}
---- TASK END ---
+--- TASKS BEGIN ---
+{{tasks}}
+--- TASKS END ---

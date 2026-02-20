@@ -20,12 +20,12 @@ Use slash commands to move through the development workflow one step at a time:
 | Command | Purpose |
 |---|---|
 | `/spec-review` | Summarize spec and surface clarifying questions |
-| `/gen-features` | Generate feature list from spec |
-| `/refine-features <request>` | Add, remove, or reprioritize features |
-| `/gen-tasks <feature-id>` | Generate task breakdown for a feature |
-| `/refine-tasks <feature-id> <request>` | Refine tasks for a feature |
-| `/start-task <feature-id> <task-id>` | Implement a specific task |
-| `/next-task` | Implement the next pending task automatically |
+| `/features-gen` | Generate feature list from spec |
+| `/features-refine <request>` | Add, remove, or reprioritize features |
+| `/tasks-gen <feature-id>` | Generate task breakdown for a feature |
+| `/tasks-refine <feature-id> <request>` | Refine tasks for a feature |
+| `/task-start <feature-id> <task-id>` | Implement a specific task |
+| `/task-next` | Implement the next pending task automatically |
 | `/checkpoint` | Save current working context |
 | `/try` | Snapshot project for experimentation |
 | `/milestone` | Declare a feature complete (quality gate) |

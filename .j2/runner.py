@@ -99,10 +99,10 @@ def extract_task(tasks_text, task_id):
 
 
 def fill_template(template, context):
-    # Replace all {{key}} tokens in the template with values from context dict.
-    for key, value in context.items():
-        template = template.replace("{{" + key + "}}", value)
-    return template
+    # Replace all {{key}} tokens in a single pass so substituted values are not re-scanned.
+    def replacer(match):
+        return context.get(match.group(1), match.group(0))
+    return re.sub(r"\{\{(\w+)\}\}", replacer, template)
 
 
 def build_context(root, settings, placeholders, args):
