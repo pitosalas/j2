@@ -12,11 +12,24 @@ Review the feature status and write a milestone summary including:
 1. **Feature completed** — which feature this milestone covers and what was built.
 2. **Rules compliance** — confirm the implementation satisfies every rule (e.g. tests written and passing, packaging conventions followed). List any that are not met.
 3. **Quality checklist** — note any cleanup, refactoring, or loose ends addressed.
-4. **Updated feature status** — restate the feature's status line with updated values.
+4. **Updated feature status** — output the complete updated feature entry in a fenced code block using this exact format, so the developer can paste it directly into `features.md`:
+
+```
+## FXX — Feature Name
+**Priority**: <priority>
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: <existing description unchanged>
+```
 5. **What's next** — the next feature or task to begin.
 
 If any rule is not satisfied, do NOT declare a milestone — list what must be done first.
 
---- FEATURES BEGIN ---
-{{features}}
---- FEATURES END ---
+Before writing the summary, check the task list below. If any task is `not started` or `in progress`, do NOT declare a milestone — list the incomplete tasks and stop.
+
+--- FEATURE BEGIN ---
+{{feature}}
+--- FEATURE END ---
+
+--- TASKS BEGIN ---
+{{tasks}}
+--- TASKS END ---

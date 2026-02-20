@@ -10,12 +10,12 @@ import yaml
 
 FOOTER = """
 ---
-End your response with exactly these four lines, using ANSI color codes to make them visually distinct (nothing after them):
-\033[32mcompleted:\033[0m <one sentence: what was just done>
-\033[33mstate:\033[0m <N> spec gaps | <N> features need tasks | <N> tasks pending   ← replace each <N> with an actual integer count
-\033[36mnext:\033[0m <the exact slash command to run next, e.g. /task-next or /tasks-gen F11>
+End your response with exactly these three lines, formatted with markdown bold labels to make them visually distinct (nothing after them):
+**completed:** <one sentence: what was just done>
+**state:** <N> spec gaps | <N> features need tasks | <N> tasks pending   ← replace each <N> with an actual integer count
+**next:** <the exact slash command to run next, e.g. /task-next or /tasks-gen F11>
 
-Also write these three lines to .j2/state.md (overwriting it), in the same format but without ANSI codes.
+Also write these three lines to .j2/state.md (overwriting it), without the markdown bold.
 """
 
 

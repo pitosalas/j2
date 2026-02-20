@@ -1,3 +1,3 @@
-completed: Saved working context to current.md with full feature status table and open questions.
-state: 0 spec gaps | 6 features need tasks | 0 tasks pending
-next: /task-next
+completed: Saved working context to .j2/current.md — F10 tasks all done, ready to /milestone F10.
+state: 0 spec gaps | 0 features need tasks | 24 tasks pending
+next: /milestone F10

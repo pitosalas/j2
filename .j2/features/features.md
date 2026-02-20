@@ -71,7 +71,7 @@ Status values:
 ---
 
 ## F10 — `/milestone` Command
-**Priority**: Medium
+**Priority**: High
 **Status**: not started | Tests written: no | Tests passing: n/a
 **Description**: Marks a feature as complete. Confirms implementation is done, tests are written and passing, and code is cleaned up. Summarizes what was completed and updates feature status. This is a quality gate, not just a snapshot.
 
@@ -155,6 +155,13 @@ Status values:
 ---
 
 ## F20 — Prompt-with-Default Input Pattern
-**Priority**: High
+**Priority**: Medium
 **Status**: not started | Tests written: no | Tests passing: n/a
 **Description**: Commands that require user input do not read from inline arguments. Instead, the prompt template instructs Claude to ask the user for the required value, offering a context-aware recommended default. Affected templates: `refine_features.md`, `gen_tasks.md`, `refine_tasks.md`, `start_task.md`, `deploy.md`.
+
+---
+
+## F23 — Workflow-Ordered Next Step Logic
+**Priority**: High
+**Status**: not started | Tests written: no | Tests passing: n/a
+**Description**: Every command's footer `next:` recommendation must follow a strict priority order: (1) if spec gaps exist, recommend `/refresh`; (2) else if any not-done feature (highest priority first) lacks a task file, recommend `/tasks-gen <feature-id>`; (3) else recommend `/task-next` to execute the first pending task in the highest-priority not-done feature. This ordering is enforced in the footer instructions appended by `runner.py` (the `FOOTER` constant) so every command automatically produces a correctly-ordered `next:` recommendation.

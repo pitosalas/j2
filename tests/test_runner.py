@@ -773,3 +773,88 @@ def test_build_context_substitutes_placeholder_for_missing_file(tmp_path):
     context = runner.build_context(tmp_path, settings, {"features"}, FakeArgs())
     assert "features" in context
     assert "not yet available" in context["features"]
+
+
+# --- F10: /milestone command ---
+
+MILESTONE_TASKS_TEXT = """\
+# Tasks for F01
+
+### T01 — Create directories
+**Status**: done
+**Description**: Make all required subdirectories.
+
+### T02 — Write tests
+**Status**: done
+**Description**: Write tests for directory creation.
+"""
+
+
+def make_milestone_project(tmp_path, rules_text, features_text, tasks_text, feature_id):
+    # Set up a minimal project for milestone rendering.
+    config_dir = tmp_path / ".j2" / "config"
+    config_dir.mkdir(parents=True)
+    settings = {"j2": {
+        "specs_dir": ".j2/specs",
+        "features_file": ".j2/features/features.md",
+        "tasks_dir": ".j2/tasks",
+        "templates_dir": ".j2/templates",
+        "rules_file": ".j2/rules.md",
+    }}
+    (config_dir / "settings.yaml").write_text(yaml.dump(settings))
+    workflow = {"steps": [{"id": "milestone", "template": "milestone.md"}]}
+    (config_dir / "workflow.yaml").write_text(yaml.dump(workflow))
+
+    (tmp_path / ".j2" / "specs").mkdir(parents=True)
+    (tmp_path / ".j2" / "rules.md").write_text(rules_text)
+
+    features_dir = tmp_path / ".j2" / "features"
+    features_dir.mkdir(parents=True)
+    (features_dir / "features.md").write_text(features_text)
+
+    tasks_dir = tmp_path / ".j2" / "tasks"
+    tasks_dir.mkdir(parents=True)
+    (tasks_dir / f"{feature_id}.md").write_text(tasks_text)
+
+    templates_dir = tmp_path / ".j2" / "templates"
+    templates_dir.mkdir(parents=True)
+    real_template = SCAFFOLD_ROOT / ".j2" / "templates" / "milestone.md"
+    (templates_dir / "milestone.md").write_text(real_template.read_text())
+
+    return tmp_path
+
+
+def test_milestone_renders_feature_and_tasks(tmp_path):
+    # Milestone template must inject the single feature section and its task list.
+    rules = "## Testing\n- Each feature needs a test."
+    root = make_milestone_project(tmp_path, rules, FEATURES_TEXT, MILESTONE_TASKS_TEXT, "F01")
+
+    settings = runner.load_config(root)
+    workflow = runner.load_workflow(root)
+    step = runner.find_step(workflow, "milestone")
+    template = runner.load_template(root, settings, step["template"])
+    placeholders = runner.find_placeholders(template)
+
+    class Args:
+        feature = "F01"
+        task = request = None
+
+    context = runner.build_context(root, settings, placeholders, Args())
+    output = runner.fill_template(template, context)
+
+    assert "Directory Scaffold" in output   # from extracted feature section
+    assert "Create directories" in output   # from tasks
+    assert "Every feature needs a test" not in output or "Testing" in output
+    assert "{{feature}}" not in output
+    assert "{{tasks}}" not in output
+    assert "{{rules}}" not in output
+
+
+def test_milestone_missing_feature_id_produces_error(tmp_path):
+    # Runner must exit non-zero when --feature is not provided for milestone.
+    result = subprocess.run(
+        ["python3", str(SCAFFOLD_ROOT / ".j2" / "runner.py"),
+         "milestone", "--root", str(tmp_path)],
+        capture_output=True, text=True
+    )
+    assert result.returncode != 0
