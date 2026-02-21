@@ -9,6 +9,13 @@ Status values:
 
 <!-- ===== INCOMPLETE FEATURES (High → Medium → Low) ===== -->
 
+## F28 — Open Source Readiness
+**Priority**: High
+**Status**: not started | Tests written: no | Tests passing: n/a
+**Description**: Add the standard files and configuration expected by open source contributors: GitHub Actions CI, issue templates, CONTRIBUTING.md, README badges, a complete .gitignore, CHANGELOG.md, SECURITY.md, CODE_OF_CONDUCT.md, and linting/coverage config in pyproject.toml.
+
+---
+
 <!-- ===== COMPLETED FEATURES (High → Medium → Low) ===== -->
 
 ## F27 — Fix Code Review Violations
