@@ -42,3 +42,4 @@ These principles apply to all code written in this project.
 - use uv for all packaging, virtual environments etc
 - all code goes into a subfolder with the same name as the overall package name
 - Dont put on PyPi
+

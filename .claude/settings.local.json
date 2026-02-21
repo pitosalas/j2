@@ -16,7 +16,10 @@
       "Bash(git -C /Users/pitosalas/mydev/jacques2 log --oneline -5)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git push:*)",
+      "Bash(/Users/pitosalas/mydev/j2/.j2/state.md:*)",
+      "Bash(git stash:*)"
     ]
   }
 }
