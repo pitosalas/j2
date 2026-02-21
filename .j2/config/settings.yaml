@@ -11,4 +11,3 @@ j2:
   tasks_dir: ".j2/tasks"
   templates_dir: ".j2/templates"
   rules_file: ".j2/rules.md"
-  snapshots_dir: "snapshots"

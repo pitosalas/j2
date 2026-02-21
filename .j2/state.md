@@ -1,3 +1,3 @@
-completed: milestone granted for F10 — milestone command with README update; README updated; F10 archived
-state: 0 spec gaps | 0 features need tasks | 4 tasks pending
-next: /task-start F12
+completed: Milestone granted for F27 — all code review violations fixed, test suite split into focused files, 103 tests passing.
+state: 0 spec gaps | 0 features need tasks | 0 tasks pending
+next: /task-next

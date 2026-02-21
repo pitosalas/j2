@@ -14,6 +14,8 @@ j2 breaks development into explicit, user-controlled steps:
 
 Every command writes a `next:` recommendation to `.j2/state.md`, so `/continue` always knows what to do next.
 
+> j2 was built using j2 itself.
+
 ## Requirements
 
 - Python 3.10+
@@ -53,23 +55,23 @@ After installation, four things to do before your first command:
 |---|---|---|
 | `/refresh` | — | Summarize spec, surface gaps, rewrite with suggested answers |
 | `/features-gen` | — | Generate prioritized feature list from spec |
-| `/features-refine` | — | Add, remove, or reprioritize features (prompts for request) |
+| `/features-update` | — | Add, remove, or reprioritize features (prompts for request) |
 | `/tasks-gen` | `<feature-id>` | Generate task breakdown for a feature |
-| `/tasks-refine` | `<feature-id>` | Refine tasks for a feature (prompts for request) |
+| `/tasks-update` | `<feature-id>` | Update tasks for a feature (prompts for request) |
 | `/task-start` | `<feature-id>` | Implement the next not-started task in a feature |
 | `/task-next` | — | Automatically find and implement the next pending task |
 | `/checkpoint` | — | Save working context to `.j2/current.md` |
-| `/try` | — | Snapshot project into `snapshots/` for experimentation |
-| `/milestone` | `<feature-id>` | Quality gate: declare a feature done, update README |
+| `/milestone` | `<feature-id>` | Quality gate: declare a feature done, archive task file, update README |
+| `/code-review` | — | Review all source files against `rules.md`; output violations as a task list |
 | `/continue` | — | Run whatever command `state.md` recommends next |
 | `/deploy` | `<target-dir>` | Bootstrap a new project from this repo |
 
-Feature IDs default to the current in-progress feature if omitted.
+Feature IDs (e.g. `F01`) default to the current in-progress feature if omitted. Commands that need open-ended text input (like a refinement request) prompt interactively after invocation.
 
 ## Workflow
 
 ```
-/refresh → /features-gen → /features-refine → /tasks-gen F01 → /task-next → /milestone F01 → …
+/refresh → /features-gen → /features-update → /tasks-gen F01 → /task-next → /milestone F01 → …
 ```
 
 Or just keep running `/continue` — it reads `state.md` and always knows the right next step.
@@ -108,7 +110,7 @@ All state lives in plain Markdown and YAML files — no database, no server, not
 - **One Claude call per command** — no automated loops; you review output at each step
 - **All state in files** — everything is readable and editable by hand
 - **Idempotent commands** — re-running any command is always safe
-- **Inline arguments** — commands that need a feature ID take it on the same line (e.g. `/tasks-gen F01`); open-ended inputs are prompted interactively
+- **Inline arguments** — commands that need a feature ID or path take it on the same line (e.g. `/tasks-gen F01`); open-ended inputs are prompted interactively
 - **No magic** — the rendered prompt is visible; you can read exactly what Claude was asked
 
 ## License

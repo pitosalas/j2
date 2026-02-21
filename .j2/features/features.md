@@ -9,14 +9,28 @@ Status values:
 
 <!-- ===== INCOMPLETE FEATURES (High → Medium → Low) ===== -->
 
-## F12 — Slash Command Registration
+<!-- ===== COMPLETED FEATURES (High → Medium → Low) ===== -->
+
+## F27 — Fix Code Review Violations
 **Priority**: High
-**Status**: in progress | Tests written: no | Tests passing: n/a
-**Description**: Each slash command is a markdown file under `.claude/commands/` that invokes `runner.py` to render the appropriate template with injected context. Commands that require a feature ID or target path take it as an inline argument via `$ARGUMENTS` (e.g. `/tasks-gen F01`); if omitted, the runner falls back to a context-aware default. Commands that need open-ended input (e.g. a refinement request) still prompt interactively.
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Fixes all violations identified by `/code-review` against `rules.md`. Violations span three files: `runner.py` (missing file header comments, several 1-2 line wrapper functions that can be inlined), `test_runner.py` (missing file header, file exceeds 500-line limit), and `test_commands.py` (missing file header, 1-line wrapper functions). Each task addresses one violation with a concrete code change.
 
 ---
 
-<!-- ===== COMPLETED FEATURES (High → Medium → Low) ===== -->
+## F26 — `/code-review` Command
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Reads `rules.md` and all source files in the project, performs a complete code review checking each file against every rule, and generates a task file listing concrete changes needed to bring the code into compliance. Each task describes a specific violation and the fix required. Output is written to `.j2/tasks/F26.md` in the standard task format so `/task-next` can drive remediation.
+
+---
+
+## F12 — Slash Command Registration
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Each slash command is a markdown file under `.claude/commands/` that invokes `runner.py` to render the appropriate template with injected context. Commands that require a feature ID or target path take it as an inline argument via `$ARGUMENTS` (e.g. `/tasks-gen F01`); if omitted, the runner falls back to a context-aware default. Commands that need open-ended input (e.g. a refinement request) still prompt interactively.
+
+---
 
 ## F10 — `/milestone` Command
 **Priority**: High
@@ -60,7 +74,7 @@ Status values:
 
 ---
 
-## F06 — `/features-refine` Command
+## F06 — `/features-update` Command
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
 **Description**: Prompts the user for a refinement request (e.g. "Add a caching feature"), offering a context-aware suggested default based on the current feature list. Applies the change and outputs the complete updated feature list. If the change implies a spec gap, also outputs an updated spec.
@@ -74,7 +88,7 @@ Status values:
 
 ---
 
-## F08 — `/tasks-refine` Command
+## F08 — `/tasks-update` Command
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
 **Description**: Prompts the user for a feature ID and a refinement request, offering sensible defaults. Applies the changes to that feature's task list.
@@ -148,13 +162,6 @@ Status values:
 **Priority**: Medium
 **Status**: done | Tests written: yes | Tests passing: yes
 **Description**: Saves current working context to `.j2/current.md` so the developer can resume later. Captures what is in progress, what was just completed, what is next, and any open questions. Unlike `/milestone`, this is not a quality gate — it can be run at any point during work.
-
----
-
-## F17 — `/try` Command
-**Priority**: Medium
-**Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Copies all project files into a timestamped snapshot directory (e.g., `snapshots/2026-02-20T0707/`) so the developer can play with and test the current state as if it were a standalone project, without affecting the working directory. No quality checks — just a raw snapshot for experimentation.
 
 ---
 

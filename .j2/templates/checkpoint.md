@@ -13,6 +13,14 @@ Output the content of `current.md` only — no explanation.
 
 After outputting the content, write it to `.j2/current.md`, overwriting any existing file.
 
+Then commit and push all current changes:
+
+1. Run `git add -A` to stage everything.
+2. Run `git diff --cached --stat` to see what changed.
+3. Write a one-line commit message that summarizes those changes (e.g. "implement F03 T02: add template rendering" or "fix load_spec warning for empty specs/"). Do not use generic messages like "checkpoint" or "wip".
+4. Run `git commit -m "<your message>"`.
+5. Run `git push`. If it fails because no upstream is set, run `git push --set-upstream origin $(git branch --show-current)` instead.
+
 --- LAST STATE BEGIN ---
 {{state}}
 --- LAST STATE END ---

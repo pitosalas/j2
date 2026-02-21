@@ -14,11 +14,11 @@ steps:
     output: ".j2/features/features.md"
     description: "Generate a prioritized feature list from the spec."
 
-  - id: features-refine
-    command: "/features-refine"
-    template: "refine_features.md"
+  - id: features-update
+    command: "/features-update"
+    template: "update_features.md"
     output: ".j2/features/features.md"
-    description: "Interactively refine the feature list."
+    description: "Interactively update the feature list."
 
   - id: tasks-gen
     command: "/tasks-gen"
@@ -26,11 +26,11 @@ steps:
     output: ".j2/tasks/{feature}.md"
     description: "Generate task breakdowns for each feature."
 
-  - id: tasks-refine
-    command: "/tasks-refine"
-    template: "refine_tasks.md"
+  - id: tasks-update
+    command: "/tasks-update"
+    template: "update_tasks.md"
     output: ".j2/tasks/{feature}.md"
-    description: "Refine the task list for a given feature."
+    description: "Update the task list for a given feature."
 
   - id: task-start
     command: "/task-start"
@@ -42,12 +42,6 @@ steps:
     template: "next_task.md"
     description: "Automatically find and implement the next pending task."
 
-  - id: try
-    command: "/try"
-    template: "try.md"
-    output: "snapshots/"
-    description: "Copy project files into a timestamped snapshot directory for experimentation."
-
   - id: checkpoint
     command: "/checkpoint"
     template: "checkpoint.md"
@@ -58,6 +52,11 @@ steps:
     command: "/milestone"
     template: "milestone.md"
     description: "Declare a feature done — confirms implementation, tests written, tests passing."
+
+  - id: code-review
+    command: "/code-review"
+    template: "code_review.md"
+    description: "Review all source files against rules.md and output violations as tasks."
 
   - id: deploy
     command: "/deploy"

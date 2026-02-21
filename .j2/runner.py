@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """j2 runner — fills a workflow template with context from disk and prints to stdout."""
+# Author: Pito Salas and Claude Code
+# Open Source Under MIT license
 
 import argparse
 import re
@@ -48,13 +50,10 @@ def find_step(workflow, command_id):
 
 
 def load_template(root, settings, template_name):
-    # Read and return the raw text of a prompt template file.
-    path = root / settings["j2"]["templates_dir"] / template_name
-    return path.read_text()
+    return (root / settings["j2"]["templates_dir"] / template_name).read_text()
 
 
 def find_placeholders(template):
-    # Return the set of placeholder names found in {{name}} tokens.
     return set(re.findall(r"\{\{(\w+)\}\}", template))
 
 
@@ -62,18 +61,14 @@ def load_spec(root, settings):
     # Concatenate all .md files in the specs directory, separated by horizontal rules.
     specs_dir = root / settings["j2"]["specs_dir"]
     parts = [f.read_text() for f in sorted(specs_dir.glob("*.md"))]
+    if not parts:
+        return "(no spec files found — add .md files to .j2/specs/ before running this command)"
     return "\n\n---\n\n".join(parts)
 
 
 def load_features(root, settings):
     # Read and return the full features file.
     path = root / settings["j2"]["features_file"]
-    return path.read_text()
-
-
-def load_rules(root, settings):
-    # Read and return the principles file.
-    path = root / settings["j2"]["rules_file"]
     return path.read_text()
 
 
@@ -162,7 +157,7 @@ def build_context(root, settings, placeholders, args):
     # Load each context value needed by the template, based on which placeholders are present.
     loaders = {
         "spec":       lambda: load_spec(root, settings),
-        "rules":      lambda: load_rules(root, settings),
+        "rules":      lambda: (root / settings["j2"]["rules_file"]).read_text(),
         "features":   lambda: load_features(root, settings),
         "feature":    lambda: extract_feature(load_features(root, settings), args.feature),
         "tasks":      lambda: load_tasks(root, settings, args.feature),
