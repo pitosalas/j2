@@ -18,7 +18,8 @@ End your response with exactly these three lines, formatted with markdown bold l
 \033[36mnext:\033[0m <slash command — determined by this priority order:
   1. If spec gaps > 0 (previous run reported {{prev_spec_gaps}} gaps) → /refresh
   2. Else if not-done features lack task files ({{missing_tasks}}) → /tasks-gen <first listed>
-  3. Else → /task-next>
+  3. Else if any tasks are pending → /task-next
+  4. Else (all features done, no pending tasks) → /features-update (to add new features) or /deploy (to ship)>
 
 Also write these three lines to .j2/state.md (overwriting it), without ANSI codes and without the markdown bold.
 """
