@@ -1,5 +1,9 @@
 # j2
 
+[![CI](https://github.com/pitosalas/j2/actions/workflows/ci.yml/badge.svg)](https://github.com/pitosalas/j2/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+
 A structured development framework for building software projects with [Claude Code](https://claude.ai/claude-code). j2 breaks development into explicit, user-controlled steps — from writing your first spec to shipping a tested feature — one slash command at a time.
 
 > j2 was built using j2 itself.
@@ -184,6 +188,14 @@ The framework itself is Python, but the projects it guides can be in any languag
 
 **What's the difference between `/task-start` and `/task-next`?**
 `/task-next` finds the next task automatically across all features. `/task-start <feature-id>` lets you pick a specific feature to work on. Use `/task-next` for normal flow; use `/task-start` when you want to jump to a particular feature.
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, coding standards, and the PR process. Please read [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before participating, and report security issues via [SECURITY.md](SECURITY.md).
+
+**Development tooling** (install with `uv sync --group dev`):
+- `pytest` + `pytest-cov` — run tests with `uv run pytest`
+- `ruff` — lint with `uv run ruff check .`
 
 ## License
 

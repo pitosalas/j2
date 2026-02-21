@@ -32,6 +32,9 @@ if ! python3 -c "import yaml" 2>/dev/null; then
 fi
 echo "PyYAML ... OK"
 
+# --- Create target directory ---
+mkdir -p "$TARGET_DIR"
+
 # --- Copy scaffold ---
 echo "Copying scaffold to $TARGET_DIR ..."
 rsync -a --ignore-existing \
