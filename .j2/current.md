@@ -1,32 +1,45 @@
-# Current Working Context
+## Just Completed
+- Fixed CI failure: added `pytest-cov` to `pip install` step in `.github/workflows/ci.yml`
+- Deployed fresh j2 project to `~/temp/j2-test-3` via `/deploy`
+- Ran `/refresh` — identified 5 spec gaps (state count definition, /continue bootstrap, current.md format, rsync propagation, milestone README scope); produced updated spec with suggested answers
 
-## What was just completed
-- F27 milestone: fixed all code review violations — file headers added to runner.py and all test files, load_rules inlined, test_runner.py (1363 lines) split into 4 focused files (conftest.py, test_runner_core.py, test_runner_commands.py, test_runner_state.py, test_runner_scaffold.py), command_file/command_content wrappers inlined in test_commands.py
-- Renamed `tasks-refine` → `tasks-update` across all files (command, template, workflow, tests, docs)
-- Updated `/checkpoint` template to commit and push with a meaningful git commit message derived from `git diff --cached --stat`
+## In Progress
+Nothing actively in progress. All 28 features are done.
 
-## What is currently in progress
-Nothing — all features are done, 103 tests passing.
+## Next Steps
+- Copy updated spec from `/refresh` output into `.j2/specs/j2.md` if desired
+- Monitor CI on latest push to confirm `pytest-cov` fix resolves the failure
 
-## What is next
-All 27 features are complete. Options:
-- Run `/code-review` again to check for any new violations introduced this session
-- Add new features via `/features-update`
-- Deploy to a new project via `/deploy`
+## Open Questions
+- Should the spec in `.j2/specs/j2.md` be updated to match the clarified version produced by `/refresh`?
 
-## Open questions
-None.
+## Feature Status Summary
 
-## Feature status summary
-
-| Feature | Description | Status |
-|---------|-------------|--------|
-| F27 | Fix Code Review Violations | done |
-| F26 | /code-review Command | done |
-| F12 | Slash Command Registration | done |
-| F10 | /milestone Command | done |
-| F01–F09 | Core framework features | done |
-| F11, F13, F15 | Install, state mgmt, rules | done |
-| F16, F18, F19 | checkpoint, task-next, deploy | done |
-| F21–F25 | continue, footer, workflow order, archives | done |
-| F14 | ROS2 profile | done |
+| Feature | Priority | Status |
+|---------|----------|--------|
+| F01 Directory Structure Scaffold | High | done |
+| F02 YAML Configuration System | High | done |
+| F03 Prompt Template System | High | done |
+| F04 /refresh | High | done |
+| F05 /features-gen | High | done |
+| F06 /features-update | High | done |
+| F07 /tasks-gen | High | done |
+| F08 /tasks-update | High | done |
+| F09 /task-start | High | done |
+| F10 /milestone | High | done |
+| F12 Slash Command Registration | High | done |
+| F13 File-Based State Management | High | done |
+| F15 Principles File | High | done |
+| F18 /task-next | High | done |
+| F21 /continue | High | done |
+| F22 Colored Structured Footer | High | done |
+| F23 Workflow-Ordered Next Step | High | done |
+| F26 /code-review | High | done |
+| F27 Fix Code Review Violations | High | done |
+| F28 Open Source Readiness | High | done |
+| F11 Install Script | Medium | done |
+| F16 /checkpoint | Medium | done |
+| F19 /deploy | Medium | done |
+| F24 Completed Tasks Archive | Medium | done |
+| F25 Completed Features Archive | Medium | done |
+| F14 ROS2 Configuration Profile | Low | done |
