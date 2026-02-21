@@ -1,8 +1,6 @@
-Output ONLY the following line and nothing else, then stop and wait for the user's input:
+Feature ID: {{feature_id}}
 
-`Feature ID [{{default_feature}}]: `
-
-After the user responds with a feature ID, read the task file at `.j2/tasks/<feature-id>.md` directly. Find the first task whose `**Status**` is `not started` and implement it. You must follow the coding principles below exactly.
+Read the task file at `.j2/tasks/{{feature_id}}.md` directly. Find the first task whose `**Status**` is `not started` and implement it. You must follow the coding principles below exactly.
 
 --- PRINCIPLES BEGIN ---
 {{rules}}

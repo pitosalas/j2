@@ -1,12 +1,10 @@
+Feature ID: {{feature_id}}
+
 Output ONLY the following line and nothing else, then stop and wait for the user's input:
-
-`Feature ID [{{default_feature}}]: `
-
-After the user responds with a feature ID, output ONLY the following line and nothing else, then stop and wait:
 
 `Refinement request: `
 
-Once you have both answers, read the task file at `.j2/tasks/<feature-id>.md` and apply the requested changes.
+Once you have the request, read the task file at `.j2/tasks/{{feature_id}}.md` and apply the requested changes.
 
 The project coding rules are below. Ensure the updated task list stays consistent with these rules (e.g. if rules require tests, there must be at least one test task).
 

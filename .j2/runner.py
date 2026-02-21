@@ -78,8 +78,11 @@ def load_rules(root, settings):
 
 
 def load_tasks(root, settings, feature_id):
-    # Read and return the task file for a given feature ID.
-    path = root / settings["j2"]["tasks_dir"] / f"{feature_id}.md"
+    # Read and return the task file for a given feature ID; check done/ if not in active tasks.
+    tasks_dir = root / settings["j2"]["tasks_dir"]
+    active = tasks_dir / f"{feature_id}.md"
+    archived = tasks_dir / "done" / f"{feature_id}.md"
+    path = active if active.exists() else archived
     return path.read_text()
 
 
@@ -164,7 +167,9 @@ def build_context(root, settings, placeholders, args):
         "feature":    lambda: extract_feature(load_features(root, settings), args.feature),
         "tasks":      lambda: load_tasks(root, settings, args.feature),
         "task":       lambda: extract_task(load_tasks(root, settings, args.feature), args.task),
+        "feature_id":       lambda: args.feature if args.feature else find_default_feature(root, settings),
         "request":          lambda: args.request,
+        "target":           lambda: args.target,
         "default_feature":  lambda: find_default_feature(root, settings),
         "prev_spec_gaps": lambda: prev_spec_gaps(root),
         "missing_tasks":  lambda: missing_tasks_summary(root, settings),
@@ -200,6 +205,7 @@ def main():
     parser.add_argument("--feature", default=None, help="Feature ID (e.g. F01)")
     parser.add_argument("--task", default=None, help="Task ID (e.g. T01)")
     parser.add_argument("--request", default=None, help="Refinement request text")
+    parser.add_argument("--target", default=None, help="Target directory (for deploy)")
     parser.add_argument("--root", default=".", help="Project root directory (default: cwd)")
     args = parser.parse_args()
 

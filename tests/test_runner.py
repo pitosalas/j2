@@ -306,8 +306,7 @@ def test_start_task_renders_all_placeholders(tmp_path):
 
     class Args:
         feature = "F01"
-        task = None
-        request = None
+        task = request = target = None
 
     context = runner.build_context(root, settings, placeholders, Args())
     output = runner.fill_template(template, context)
@@ -836,17 +835,46 @@ def test_milestone_renders_feature_and_tasks(tmp_path):
 
     class Args:
         feature = "F01"
-        task = request = None
+        task = request = target = None
 
     context = runner.build_context(root, settings, placeholders, Args())
     output = runner.fill_template(template, context)
 
     assert "Directory Scaffold" in output   # from extracted feature section
     assert "Create directories" in output   # from tasks
-    assert "Every feature needs a test" not in output or "Testing" in output
+    assert "Each feature needs a test" in output  # from rules
     assert "{{feature}}" not in output
     assert "{{tasks}}" not in output
     assert "{{rules}}" not in output
+
+
+def test_milestone_template_instructs_readme_update():
+    # milestone.md must instruct Claude to update README.md after granting milestone.
+    content = (TEMPLATES_ROOT / "milestone.md").read_text()
+    assert "readme" in content.lower()
+    assert "rewrite" in content.lower() or "update" in content.lower()
+
+
+def test_milestone_renders_feature_id(tmp_path):
+    # {{feature_id}} must be substituted with the passed feature ID.
+    rules = "## Testing\n- Each feature needs a test."
+    root = make_milestone_project(tmp_path, rules, FEATURES_TEXT, MILESTONE_TASKS_TEXT, "F01")
+
+    settings = runner.load_config(root)
+    workflow = runner.load_workflow(root)
+    step = runner.find_step(workflow, "milestone")
+    template = runner.load_template(root, settings, step["template"])
+    placeholders = runner.find_placeholders(template)
+
+    class Args:
+        feature = "F01"
+        task = request = target = None
+
+    context = runner.build_context(root, settings, placeholders, Args())
+    output = runner.fill_template(template, context)
+
+    assert "{{feature_id}}" not in output
+    assert "F01" in output
 
 
 def test_milestone_missing_feature_id_produces_error(tmp_path):
@@ -1195,8 +1223,8 @@ def make_deploy_project(tmp_path, request_value):
     return tmp_path
 
 
-def test_deploy_renders_with_provided_request(tmp_path):
-    # When request is provided, output must contain the target path and bash command.
+def test_deploy_renders_with_provided_target(tmp_path):
+    # When --target is provided, output must contain the target path and bash command.
     root = make_deploy_project(tmp_path, "../my-project")
 
     settings = runner.load_config(root)
@@ -1205,67 +1233,50 @@ def test_deploy_renders_with_provided_request(tmp_path):
     template = runner.load_template(root, settings, step["template"])
 
     class Args:
-        feature = task = None
-        request = "../my-project"
+        feature = task = request = None
+        target = "../my-project"
 
     placeholders = runner.find_placeholders(template)
     context = runner.build_context(root, settings, placeholders, Args())
     output = runner.fill_template(template, context)
 
-    assert "Target directory" in output
-    assert "../my-new-project" in output  # default shown in bare prompt
+    assert "../my-project" in output
     assert "mkdir" in output
     assert "install.sh" in output
 
 
-def test_deploy_renders_with_empty_request_prompts_user(tmp_path):
-    # When request is empty, output must instruct Claude to ask the user.
-    root = make_deploy_project(tmp_path, "")
+# --- F12: inline argument pattern ---
+# Commands that take open-ended text input still use stop-and-wait.
+# Commands that take a feature ID or target path use inline {{feature_id}} / {{target}}.
 
-    settings = runner.load_config(root)
-    workflow = runner.load_workflow(root)
-    step = runner.find_step(workflow, "deploy")
-    template = runner.load_template(root, settings, step["template"])
-
-    class Args:
-        feature = task = None
-        request = ""
-
-    placeholders = runner.find_placeholders(template)
-    context = runner.build_context(root, settings, placeholders, Args())
-    output = runner.fill_template(template, context)
-
-    assert "ask" in output.lower() or "my-new-project" in output
-
-
-# --- F20: prompt-with-default input pattern ---
-
-PROMPT_WITH_DEFAULT_TEMPLATES = [
+INTERACTIVE_PROMPT_TEMPLATES = [
     "refine_features.md",
-    "gen_tasks.md",
     "refine_tasks.md",
-    "start_task.md",
-    "deploy.md",
 ]
 
-@pytest.mark.parametrize("tmpl", PROMPT_WITH_DEFAULT_TEMPLATES)
-def test_prompt_with_default_template_contains_ask_instruction(tmpl):
-    # Each affected template must instruct Claude to output a bare prompt and wait.
+@pytest.mark.parametrize("tmpl", INTERACTIVE_PROMPT_TEMPLATES)
+def test_interactive_prompt_template_contains_stop_and_wait(tmpl):
+    # Templates with open-ended prompts must still instruct Claude to stop and wait.
     content = (TEMPLATES_ROOT / tmpl).read_text()
     assert "stop and wait" in content.lower(), f"{tmpl} missing 'stop and wait' instruction"
 
-@pytest.mark.parametrize("tmpl", ["refine_tasks.md", "start_task.md", "gen_tasks.md"])
-def test_prompt_with_default_template_uses_features_not_feature(tmpl):
-    # Templates must use {{features}} (full list) instead of {{feature}} (pre-extracted section).
+INLINE_ARG_TEMPLATES = [
+    "gen_tasks.md",
+    "start_task.md",
+    "milestone.md",
+]
+
+@pytest.mark.parametrize("tmpl", INLINE_ARG_TEMPLATES)
+def test_inline_arg_template_uses_feature_id_placeholder(tmpl):
+    # Templates using inline feature ID must inject {{feature_id}}.
+    content = (TEMPLATES_ROOT / tmpl).read_text()
+    assert "{{feature_id}}" in content, f"{tmpl} missing {{{{feature_id}}}} placeholder"
+
+@pytest.mark.parametrize("tmpl", ["refine_tasks.md", "gen_tasks.md"])
+def test_template_uses_features_placeholder(tmpl):
+    # These templates must inject the full feature list via {{features}}.
     content = (TEMPLATES_ROOT / tmpl).read_text()
     assert "{{features}}" in content, f"{tmpl} missing {{{{features}}}} placeholder"
-    assert "{{feature}}" not in content, f"{tmpl} still uses {{{{feature}}}}"
-
-@pytest.mark.parametrize("tmpl", ["refine_tasks.md", "start_task.md"])
-def test_prompt_with_default_template_drops_tasks_placeholder(tmpl):
-    # refine_tasks and start_task no longer pre-load a specific feature's tasks.
-    content = (TEMPLATES_ROOT / tmpl).read_text()
-    assert "{{tasks}}" not in content, f"{tmpl} still uses {{{{tasks}}}}"
 
 
 # --- F14: ROS2 configuration profile ---

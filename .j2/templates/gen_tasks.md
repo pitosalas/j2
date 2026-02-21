@@ -1,8 +1,6 @@
-Output ONLY the following line and nothing else, then stop and wait for the user's input:
+Feature ID: {{feature_id}}
 
-`Feature ID [{{default_feature}}]: `
-
-After the user responds with a feature ID, generate or update the task list for that feature following the instructions below.
+Generate or update the task list for this feature following the instructions below.
 
 You must follow these coding principles when generating tasks:
 

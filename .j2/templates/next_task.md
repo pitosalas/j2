@@ -35,7 +35,9 @@ Follow these coding rules exactly:
 
 4. Implement that task. Follow the rules above. Write clean, working code.
 
-5. After implementing, briefly state:
-   - Which feature and task you worked on (e.g. F02 / T03)
-   - What you built
-   - What the developer should do next (run tests, then `/task-next` again, or `/milestone` if the feature is complete)
+5. After implementing:
+   - Update that task's `**Status**` to `done` in the task file.
+   - Check whether **all** tasks in the file are now `done`.
+     - If yes: run `mv .j2/tasks/<feature-id>.md .j2/tasks/done/<feature-id>.md` to archive the task file.
+   - Briefly state which feature and task you worked on (e.g. F02 / T03) and what you built.
+   - State what the developer should do next: run tests, then `/task-next` again, or `/milestone <feature-id>` if the feature is complete.

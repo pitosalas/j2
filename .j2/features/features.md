@@ -9,7 +9,21 @@ Status values:
 
 <!-- ===== INCOMPLETE FEATURES (High → Medium → Low) ===== -->
 
+## F12 — Slash Command Registration
+**Priority**: High
+**Status**: in progress | Tests written: no | Tests passing: n/a
+**Description**: Each slash command is a markdown file under `.claude/commands/` that invokes `runner.py` to render the appropriate template with injected context. Commands that require a feature ID or target path take it as an inline argument via `$ARGUMENTS` (e.g. `/tasks-gen F01`); if omitted, the runner falls back to a context-aware default. Commands that need open-ended input (e.g. a refinement request) still prompt interactively.
+
+---
+
 <!-- ===== COMPLETED FEATURES (High → Medium → Low) ===== -->
+
+## F10 — `/milestone` Command
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Marks a feature as complete. Confirms implementation is done, tests are written and passing, and code is cleaned up. Acts as a quality gate: if tests are missing or failing, the milestone is not granted. On success: moves the task file to `tasks/done/`, moves the feature entry in `features.md` from the incomplete section to the completed section in priority order, and reviews the spec and codebase to update `README.md` to reflect the current state of the project.
+
+---
 
 ## F01 — Directory Structure Scaffold
 **Priority**: High
@@ -71,20 +85,6 @@ Status values:
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
 **Description**: Prompts the user for a feature ID, suggesting the first in-progress or not-started feature as the default. Finds the first not-started task in that feature and implements it.
-
----
-
-## F10 — `/milestone` Command
-**Priority**: High
-**Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Marks a feature as complete. Confirms implementation is done, tests are written and passing, and code is cleaned up. Acts as a quality gate: if tests are missing or failing, the milestone is not granted. On success: moves the task file to `tasks/done/`, and moves the feature entry in `features.md` from the incomplete section to the completed section in priority order.
-
----
-
-## F12 — Slash Command Registration
-**Priority**: High
-**Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Each slash command is a markdown file under `.claude/commands/` that invokes `runner.py` to render the appropriate template with injected context. Commands that require user input do not take inline parameters — instead the rendered prompt instructs Claude to output a bare prompt and wait for the user's answer.
 
 ---
 
@@ -162,13 +162,6 @@ Status values:
 **Priority**: Medium
 **Status**: done | Tests written: yes | Tests passing: yes
 **Description**: Prompts the user for a target directory path (suggesting a sensible default). Creates that directory and runs `install.sh` on it to bootstrap a fresh j2 project. Used to deploy the scaffold from the dev repo to a new project.
-
----
-
-## F20 — Prompt-with-Default Input Pattern
-**Priority**: Medium
-**Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Commands that require user input output a bare prompt line and wait, rather than generating prose. The default value is pre-computed by the runner and injected via `{{default_feature}}`. Affected templates: `refine_features.md`, `gen_tasks.md`, `refine_tasks.md`, `start_task.md`, `deploy.md`.
 
 ---
 
