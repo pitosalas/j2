@@ -46,3 +46,5 @@ Format each task as:
 --- CURRENT TASKS BEGIN ---
 {{tasks}}
 --- CURRENT TASKS END ---
+
+Generate the task list and write it directly to `.j2/tasks/{{feature_id}}.md`. Do not display the task list in the console — just confirm the file was written with a single line like: "Written: .j2/tasks/{{feature_id}}.md (N tasks)"

@@ -1,3 +1,3 @@
-completed: Saved context to current.md and pushed CI fix (add pytest-cov) to main.
+completed: Milestone granted for F29 — /deploy clean export mode; features.md and README updated.
 state: 0 spec gaps | 0 features need tasks | 0 tasks pending
-next: /checkpoint
+next: /features-update (to add new features) or /deploy (to ship)

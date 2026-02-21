@@ -97,10 +97,32 @@ After installing into a new project directory:
 | `/checkpoint` | — | Save context to `.j2/current.md`, commit, and push to git |
 | `/code-review` | — | Check all source files against `rules.md`; list violations as tasks |
 | `/continue` | — | Run whatever the last command recommended as the next step |
-| `/deploy` | `<target-dir>` | Bootstrap a new project from this repo |
+| `/deploy` | `<target-dir>` | Dev repo: bootstrap a new j2 project. Deployed project: clean export with all j2 files stripped |
 
 **Feature IDs** (e.g. `F01`) default to the current in-progress feature if omitted.
 **Open-ended inputs** (like a refinement request) are prompted interactively after invocation.
+
+## The `/deploy` Command
+
+`/deploy` does two different things depending on where you run it:
+
+**From the j2 dev repo** (when `scaffold/` is present) — bootstraps a new j2 project:
+
+```
+/deploy ../my-new-project
+```
+
+Creates the target directory and runs `install.sh` to copy the j2 scaffold into it. Use this to start a new project.
+
+**From a deployed project** (when `scaffold/` is absent) — exports a clean copy of your project:
+
+```
+/deploy ../my-app-release
+```
+
+Copies your project to the target directory and strips all j2 infrastructure: `.j2/`, `.claude/`, `scaffold/`, and `runner.py`. The result is a standalone project with no evidence that j2 was used — ready to ship or hand off.
+
+The mode is detected automatically. You don't need to specify it.
 
 ## The `/continue` Command
 

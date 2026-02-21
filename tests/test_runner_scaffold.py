@@ -303,3 +303,43 @@ def test_milestone_missing_feature_id_produces_error(tmp_path):
         capture_output=True, text=True
     )
     assert result.returncode != 0
+
+
+# --- F29: clean_export ---
+
+PROJECT_ROOT = Path(__file__).parent.parent
+
+
+def test_clean_export_copies_source_files(tmp_path):
+    runner.clean_export(PROJECT_ROOT, tmp_path)
+    assert (tmp_path / "tests").is_dir()
+    assert any(tmp_path.glob("*.toml")) or any(tmp_path.glob("*.md"))
+
+
+def test_clean_export_removes_j2_dir(tmp_path):
+    runner.clean_export(PROJECT_ROOT, tmp_path)
+    assert not (tmp_path / ".j2").exists()
+
+
+def test_clean_export_removes_scaffold_dir(tmp_path):
+    runner.clean_export(PROJECT_ROOT, tmp_path)
+    assert not (tmp_path / "scaffold").exists()
+
+
+def test_clean_export_removes_claude_dir(tmp_path):
+    runner.clean_export(PROJECT_ROOT, tmp_path)
+    assert not (tmp_path / ".claude").exists()
+
+
+def test_clean_export_removes_runner_py(tmp_path):
+    runner.clean_export(PROJECT_ROOT, tmp_path)
+    assert not (tmp_path / "runner.py").exists()
+
+
+def test_deploy_mode_dev_repo():
+    # In the dev repo, scaffold/ exists — mode should be dev-repo.
+    import argparse
+    args = argparse.Namespace(feature=None, task=None, request=None, target=None)
+    settings = runner.load_config(PROJECT_ROOT)
+    context = runner.build_context(PROJECT_ROOT, settings, {"deploy_mode"}, args)
+    assert context["deploy_mode"] == "dev-repo"

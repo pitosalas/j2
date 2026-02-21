@@ -11,6 +11,13 @@ Status values:
 
 <!-- ===== COMPLETED FEATURES (High → Medium → Low) ===== -->
 
+## F29 — `/deploy` Clean Export Mode
+**Priority**: Medium
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: When `/deploy` is invoked from a deployed project (not the j2 dev repo), it creates a new directory containing the project in fully working form with all j2 infrastructure removed — no `.j2/`, no `scaffold/`, no `.claude/commands/`, no `runner.py`, and no other evidence that j2 was used. The result is a clean, standalone copy of the project that can be shipped or handed off independently. The two modes are distinguished by detecting whether a `scaffold/` directory exists (dev repo) or not (deployed project).
+
+---
+
 ## F28 — Open Source Readiness
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
