@@ -1,3 +1,3 @@
-completed: Refreshed spec — added /code-review and /checkpoint git-push behavior, removed step numbers, folded README note into Constraints, clarified /milestone README update.
+completed: Milestone granted for F29 — /deploy clean export mode; features.md and README updated.
 state: 0 spec gaps | 0 features need tasks | 0 tasks pending
-next: /task-next
+next: /features-update (to add new features) or /deploy (to ship)

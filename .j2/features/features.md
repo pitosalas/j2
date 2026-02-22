@@ -9,14 +9,21 @@ Status values:
 
 <!-- ===== INCOMPLETE FEATURES (High → Medium → Low) ===== -->
 
-## F28 — Open Source Readiness
-**Priority**: High
-**Status**: not started | Tests written: no | Tests passing: n/a
-**Description**: Add the standard files and configuration expected by open source contributors: GitHub Actions CI, issue templates, CONTRIBUTING.md, README badges, a complete .gitignore, CHANGELOG.md, SECURITY.md, CODE_OF_CONDUCT.md, and linting/coverage config in pyproject.toml.
+<!-- ===== COMPLETED FEATURES (High → Medium → Low) ===== -->
+
+## F29 — `/deploy` Clean Export Mode
+**Priority**: Medium
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: When `/deploy` is invoked from a deployed project (not the j2 dev repo), it creates a new directory containing the project in fully working form with all j2 infrastructure removed — no `.j2/`, no `scaffold/`, no `.claude/commands/`, no `runner.py`, and no other evidence that j2 was used. The result is a clean, standalone copy of the project that can be shipped or handed off independently. The two modes are distinguished by detecting whether a `scaffold/` directory exists (dev repo) or not (deployed project).
 
 ---
 
-<!-- ===== COMPLETED FEATURES (High → Medium → Low) ===== -->
+## F28 — Open Source Readiness
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Add the standard files and configuration expected by open source contributors: GitHub Actions CI, issue templates, CONTRIBUTING.md, README badges, a complete .gitignore, CHANGELOG.md, SECURITY.md, CODE_OF_CONDUCT.md, and linting/coverage config in pyproject.toml.
+
+---
 
 ## F27 — Fix Code Review Violations
 **Priority**: High

@@ -1,7 +1,11 @@
 # j2
 
 [![CI](https://github.com/pitosalas/j2/actions/workflows/ci.yml/badge.svg)](https://github.com/pitosalas/j2/actions/workflows/ci.yml)
+<<<<<<< HEAD
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+=======
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+>>>>>>> 144eea6008120466d5b14cbada8a82c26190e81d
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 
 A structured development framework for building software projects with [Claude Code](https://claude.ai/claude-code). j2 breaks development into explicit, user-controlled steps — from writing your first spec to shipping a tested feature — one slash command at a time.
@@ -97,10 +101,32 @@ After installing into a new project directory:
 | `/checkpoint` | — | Save context to `.j2/current.md`, commit, and push to git |
 | `/code-review` | — | Check all source files against `rules.md`; list violations as tasks |
 | `/continue` | — | Run whatever the last command recommended as the next step |
-| `/deploy` | `<target-dir>` | Bootstrap a new project from this repo |
+| `/deploy` | `<target-dir>` | Dev repo: bootstrap a new j2 project. Deployed project: clean export with all j2 files stripped |
 
 **Feature IDs** (e.g. `F01`) default to the current in-progress feature if omitted.
 **Open-ended inputs** (like a refinement request) are prompted interactively after invocation.
+
+## The `/deploy` Command
+
+`/deploy` does two different things depending on where you run it:
+
+**From the j2 dev repo** (when `scaffold/` is present) — bootstraps a new j2 project:
+
+```
+/deploy ../my-new-project
+```
+
+Creates the target directory and runs `install.sh` to copy the j2 scaffold into it. Use this to start a new project.
+
+**From a deployed project** (when `scaffold/` is absent) — exports a clean copy of your project:
+
+```
+/deploy ../my-app-release
+```
+
+Copies your project to the target directory and strips all j2 infrastructure: `.j2/`, `.claude/`, `scaffold/`, and `runner.py`. The result is a standalone project with no evidence that j2 was used — ready to ship or hand off.
+
+The mode is detected automatically. You don't need to specify it.
 
 ## The `/continue` Command
 
@@ -188,6 +214,14 @@ The framework itself is Python, but the projects it guides can be in any languag
 
 **What's the difference between `/task-start` and `/task-next`?**
 `/task-next` finds the next task automatically across all features. `/task-start <feature-id>` lets you pick a specific feature to work on. Use `/task-next` for normal flow; use `/task-start` when you want to jump to a particular feature.
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, coding standards, and the PR process. Please read [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before participating, and report security issues via [SECURITY.md](SECURITY.md).
+
+**Development tooling** (install with `uv sync --group dev`):
+- `pytest` + `pytest-cov` — run tests with `uv run pytest`
+- `ruff` — lint with `uv run ruff check .`
 
 ## License
 
