@@ -1,20 +1,21 @@
-## Just Completed
-- F29 milestone: /deploy clean export mode — deploy_mode context in runner.py, dual-mode deploy template, clean_export() function, 7 tests passing
-- README updated with dedicated /deploy section explaining both modes
-- Fixed FOOTER next: logic (added all-done case)
-- Fixed CI: added pytest-cov to workflow
-- Spec clarifications applied (5 gaps resolved from /refresh)
-- gen_tasks templates updated: write silently to file, confirm with one line
-
 ## In Progress
-Nothing. All 29 features done.
+Nothing — all 33 features complete.
+
+## Just Completed
+- F30: Token minimization — removed spec/features from task templates, added filter_done_features()
+- F31: Parallel-safe command documentation — added Parallel Usage section to README
+- F32: `/task-run-all` command — run all tasks in a feature without stopping
+- F33: `/features-parallel` command — launch background agents for multiple features
+- Updated rules.md — removed redundant rules, added testing/output/error-handling rules
+- Created `.claude/CLAUDE.md` for session orientation
+- Fixed merge conflict in README badges
 
 ## Next Steps
-- /features-update to add new features
-- /deploy <path> to export a clean copy of the project
+- Use `/features-update` to add new features, or `/deploy` to ship
+- Test `/task-run-all` and `/features-parallel` on a real multi-feature project
 
 ## Open Questions
 None.
 
 ## Feature Status Summary
-All 29 features done (F01–F29). No incomplete features.
+All 33 features done (F01–F33). No incomplete features. 121 tests passing.

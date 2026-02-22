@@ -10,11 +10,3 @@ After writing the code:
 1. Update that task's `**Status**` to `done` in the task file.
 2. Briefly explain what you implemented and any decisions you made.
 3. State what the developer should do next (run tests, then `/task-start` again or `/milestone` if the feature is complete).
-
---- SPEC BEGIN ---
-{{spec}}
---- SPEC END ---
-
---- FEATURES BEGIN ---
-{{features}}
---- FEATURES END ---

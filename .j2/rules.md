@@ -8,6 +8,8 @@ These principles apply to all code written in this project.
 ## Testing
 - Each feature must have at least one test.
 - Don't test every exception; let unusual situations crash.
+- Test names describe expected behavior, not the method name (e.g. `test_returns_none_when_empty`)
+- Use pytest fixtures sparingly — plain helper functions are clearer
 
 ## Python
 - Version 3.10 or later
@@ -15,12 +17,10 @@ These principles apply to all code written in this project.
 - All code goes into a subfolder with the same name as the package
 - Don't put on PyPi
 - Prefer async/await over threading when there is a choice
-- Look for existing libraries instead of reinventing solutions
-- Use f-strings whenever possible
 - Use double quotes; single quotes only when specifically required
 - No default parameters — make callers provide all values explicitly
-- No bare `except`; be specific about exception types
 - Don't code defensively; let exceptions bubble up
+- Don't wrap code in try/except just to re-raise or log — let it crash
 - YAGNI: only add what current requirements explicitly need
 
 ## File Headers
@@ -42,18 +42,18 @@ These principles apply to all code written in this project.
 - All imports at the top of the file; use absolute imports with module aliases
 
 ## Naming
-- Intention-revealing names for all classes, functions, methods, variables
 - Obvious abbreviations are fine; keep identifiers under ~15 chars
-- A good name eliminates the need for a block comment
 
 ## Comments
 - Comment a function or method only if the name alone is not sufficient
 - No more than 1-2 lines per comment
 
+## Output
+- No print statements except in CLI entry points
+- No progress bars, spinners, or emoji in output
+
 ## Code Quality
-- Minimize duplication; keep code DRY
 - Don't assign a function result to a variable just to use it once — call directly
-- Each step of a multi-step refactor must leave the program runnable
 
 ## ROS
 - Use ROS2 and colcon builds for ROS2 programs
