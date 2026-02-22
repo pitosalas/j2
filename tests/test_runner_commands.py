@@ -8,7 +8,7 @@ from pathlib import Path
 import runner
 import yaml
 
-from conftest import FEATURES_TEXT, TASKS_TEXT, TEMPLATES_ROOT
+from conftest import CONFIG_ROOT, FEATURES_TEXT, TASKS_TEXT, TEMPLATES_ROOT
 
 
 def _base_settings():
@@ -149,11 +149,10 @@ def test_start_task_renders_all_placeholders(tmp_path):
     context = runner.build_context(root, settings, placeholders, Args())
     output = runner.fill_template(template, context)
 
-    assert "Widget App" in output
     assert "Each feature needs a test" in output
-    assert "Directory Scaffold" in output
-    assert "{{spec}}" not in output
     assert "{{rules}}" not in output
+    # spec and features no longer injected into start_task template (F30)
+    assert "{{spec}}" not in output
     assert "{{features}}" not in output
 
 
@@ -333,9 +332,58 @@ def test_task_next_renders_rules_spec_and_features(tmp_path):
     context = runner.build_context(root, settings, placeholders, Args())
     output = runner.fill_template(template, context)
 
-    assert "Widget App" in output
     assert "Every feature needs a test" in output
-    assert "Directory Scaffold" in output
     assert "{{rules}}" not in output
+    # spec and features no longer injected into next_task template (F30)
     assert "{{spec}}" not in output
     assert "{{features}}" not in output
+
+
+# --- F32: /task-run-all command ---
+
+def test_run_all_tasks_template_has_correct_placeholders():
+    template = (TEMPLATES_ROOT / "run_all_tasks.md").read_text()
+    assert "{{feature_id}}" in template
+    assert "{{rules}}" in template
+    assert "{{spec}}" not in template
+    assert "{{features}}" not in template
+
+
+def test_run_all_tasks_workflow_entry_exists():
+    workflow = yaml.safe_load((CONFIG_ROOT / "workflow.yaml").read_text())
+    step_ids = [s["id"] for s in workflow["steps"]]
+    assert "task-run-all" in step_ids
+    step = next(s for s in workflow["steps"] if s["id"] == "task-run-all")
+    assert step["template"] == "run_all_tasks.md"
+
+
+def test_run_all_tasks_slash_command_exists():
+    cmd_path = Path(__file__).parent.parent / ".claude" / "commands" / "task-run-all.md"
+    assert cmd_path.exists()
+    content = cmd_path.read_text()
+    assert "runner.py task-run-all" in content
+    assert "$ARGUMENTS" in content
+
+
+# --- F33: /features-parallel command ---
+
+def test_features_parallel_template_has_correct_placeholders():
+    template = (TEMPLATES_ROOT / "features_parallel.md").read_text()
+    assert "{{features}}" in template
+    assert "{{rules}}" in template
+    assert "{{spec}}" not in template
+
+
+def test_features_parallel_workflow_entry_exists():
+    workflow = yaml.safe_load((CONFIG_ROOT / "workflow.yaml").read_text())
+    step_ids = [s["id"] for s in workflow["steps"]]
+    assert "features-parallel" in step_ids
+    step = next(s for s in workflow["steps"] if s["id"] == "features-parallel")
+    assert step["template"] == "features_parallel.md"
+
+
+def test_features_parallel_slash_command_exists():
+    cmd_path = Path(__file__).parent.parent / ".claude" / "commands" / "features-parallel.md"
+    assert cmd_path.exists()
+    content = cmd_path.read_text()
+    assert "runner.py features-parallel" in content

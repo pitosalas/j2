@@ -1,11 +1,7 @@
 # j2
 
 [![CI](https://github.com/pitosalas/j2/actions/workflows/ci.yml/badge.svg)](https://github.com/pitosalas/j2/actions/workflows/ci.yml)
-<<<<<<< HEAD
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-=======
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
->>>>>>> 144eea6008120466d5b14cbada8a82c26190e81d
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 
 A structured development framework for building software projects with [Claude Code](https://claude.ai/claude-code). j2 breaks development into explicit, user-controlled steps — from writing your first spec to shipping a tested feature — one slash command at a time.
@@ -97,6 +93,8 @@ After installing into a new project directory:
 | `/tasks-update` | `<feature-id>` | Refine the task list for a feature |
 | `/task-next` | — | Find and implement the next pending task automatically |
 | `/task-start` | `<feature-id>` | Implement the next task in a specific feature |
+| `/task-run-all` | `<feature-id>` | Implement all tasks in a feature sequentially without stopping |
+| `/features-parallel` | — | Launch background agents to implement multiple features concurrently |
 | `/milestone` | `<feature-id>` | Quality gate: confirm tests pass, archive tasks, update README |
 | `/checkpoint` | — | Save context to `.j2/current.md`, commit, and push to git |
 | `/code-review` | — | Check all source files against `rules.md`; list violations as tasks |
@@ -172,7 +170,7 @@ Each slash command is a tiny Markdown file that calls:
 python3 .j2/runner.py <command> --root .
 ```
 
-`runner.py` reads the matching template from `.j2/templates/`, injects context (your spec, feature list, task list, rules) via `{{placeholder}}` substitution, and prints the filled prompt for Claude to act on.
+`runner.py` reads the matching template from `.j2/templates/`, injects context (your spec, feature list, task list, rules) via `{{placeholder}}` substitution, and prints the filled prompt for Claude to act on. Templates only inject the context they actually need — task-execution commands skip the full spec and feature list to minimize token usage. Completed features are automatically filtered out of the `{{features}}` placeholder.
 
 All state is plain Markdown and YAML — no database, no server, no lock-in. Every file is readable and editable by hand.
 
@@ -182,6 +180,21 @@ All state is plain Markdown and YAML — no database, no server, no lock-in. Eve
 - **All state in files** — inspect, edit, or roll back anything by hand
 - **Idempotent** — re-running any command is always safe
 - **No magic** — the rendered prompt is visible; you can read exactly what Claude was asked
+- **Token-efficient** — templates inject only the context each command needs; completed features are filtered out automatically
+
+## Parallel Usage
+
+Per-feature commands operate on a single task file and can safely run in a separate Claude Code session while another feature is being worked on. Commands that modify shared files require exclusive access.
+
+| Safe to run in parallel | Requires exclusive access |
+|---|---|
+| `/task-start <FID>` | `/features-gen` |
+| `/task-next` (different features) | `/features-update` |
+| `/tasks-gen <FID>` | `/milestone` |
+| `/tasks-update <FID>` | `/checkpoint` |
+| `/code-review` | `/refresh` |
+
+No locking is enforced — avoid running two exclusive commands at the same time.
 
 ## FAQ
 

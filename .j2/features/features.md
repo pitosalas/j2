@@ -11,6 +11,27 @@ Status values:
 
 <!-- ===== COMPLETED FEATURES (High → Medium → Low) ===== -->
 
+## F33 — `/features-parallel` Command
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Scans the feature list for all not-done features that have task files. For each, launches a background Task agent to implement all not-started tasks sequentially (same behavior as `/task-run-all`). Agents work independently on separate features and do not modify shared files (`features.md`, `state.md`, `README.md`). After all agents complete, the user runs `/milestone` for each feature.
+
+---
+
+## F32 — `/task-run-all` Command
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Implements every not-started task in a feature sequentially without pausing. Takes a feature ID as an inline argument (defaults to first in-progress or not-started feature). Reads the task file, implements each task in order, updates its status to `done`, then moves to the next. Runs the test suite after all tasks are done. Does not touch `features.md` or archive the task file — that is left to `/milestone`.
+
+---
+
+## F30 — Token Minimization in Templates
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Reduce token waste in slash command templates. Remove `{{spec}}` and `{{features}}` from task-execution templates (`start_task.md`, `next_task.md`) since the task file provides sufficient context. Add a runner function that filters `{{features}}` to strip done entries and replace them with a summary count. Trim verbose template prose. Runner output remains silent on success (errors to stderr only).
+
+---
+
 ## F29 — `/deploy` Clean Export Mode
 **Priority**: Medium
 **Status**: done | Tests written: yes | Tests passing: yes
@@ -155,6 +176,13 @@ Status values:
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
 **Description**: Every command's footer `next:` recommendation must follow a strict priority order: (1) if spec gaps exist, recommend `/refresh`; (2) else if any not-done feature (highest priority first) lacks a task file, recommend `/tasks-gen <feature-id>`; (3) else recommend `/task-next` to execute the first pending task in the highest-priority not-done feature. This ordering is enforced in the footer instructions appended by `runner.py` (the `FOOTER` constant) so every command automatically produces a correctly-ordered `next:` recommendation.
+
+---
+
+## F31 — Parallel-Safe Command Documentation
+**Priority**: Medium
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Document which commands are parallel-safe (per-feature commands like `/task-start <FID>`, `/tasks-gen <FID>`, `/tasks-update <FID>`) and which require exclusive access (commands that modify shared files: `/features-update`, `/milestone`, `/checkpoint`). Added a Parallel Usage section to the README with a safe/exclusive command table.
 
 ---
 

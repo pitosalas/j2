@@ -74,6 +74,22 @@ def load_features(root, settings):
     return path.read_text()
 
 
+def filter_done_features(features_text):
+    # Strip done feature sections, replace with a count summary.
+    sections = re.split(r"(?=^## F)", features_text, flags=re.MULTILINE)
+    kept = []
+    done_count = 0
+    for section in sections:
+        if section.startswith("## F") and re.search(r"\*\*Status\*\*:\s*done", section, re.IGNORECASE):
+            done_count += 1
+            continue
+        kept.append(section)
+    result = "".join(kept).rstrip()
+    if done_count > 0:
+        result += f"\n\n--- {done_count} completed features omitted ---\n"
+    return result
+
+
 def load_tasks(root, settings, feature_id):
     # Read and return the task file for a given feature ID; check done/ if not in active tasks.
     tasks_dir = root / settings["j2"]["tasks_dir"]
@@ -175,7 +191,7 @@ def build_context(root, settings, placeholders, args):
     loaders = {
         "spec":       lambda: load_spec(root, settings),
         "rules":      lambda: (root / settings["j2"]["rules_file"]).read_text(),
-        "features":   lambda: load_features(root, settings),
+        "features":   lambda: filter_done_features(load_features(root, settings)),
         "feature":    lambda: extract_feature(load_features(root, settings), args.feature),
         "tasks":      lambda: load_tasks(root, settings, args.feature),
         "task":       lambda: extract_task(load_tasks(root, settings, args.feature), args.task),

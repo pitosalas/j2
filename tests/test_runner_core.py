@@ -9,7 +9,7 @@ import pytest
 import runner
 import yaml
 
-from conftest import FEATURES_TEXT, TASKS_TEXT
+from conftest import FEATURES_TEXT, TASKS_TEXT, TEMPLATES_ROOT
 
 
 WORKFLOW = [
@@ -149,3 +149,60 @@ def test_build_context_substitutes_placeholder_for_missing_file(tmp_path):
     context = runner.build_context(tmp_path, settings, {"features"}, FakeArgs())
     assert "features" in context
     assert "not yet available" in context["features"]
+
+
+FEATURES_WITH_DONE = """\
+# Feature List
+
+## F01 — Directory Scaffold
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Creates the directory tree.
+
+---
+
+## F02 — YAML Config
+**Priority**: High
+**Status**: not started | Tests written: no | Tests passing: n/a
+**Description**: Reads YAML settings.
+
+---
+
+## F03 — Another Done
+**Priority**: Medium
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Another completed feature.
+
+---
+"""
+
+
+def test_filter_done_features_strips_done():
+    result = runner.filter_done_features(FEATURES_WITH_DONE)
+    assert "F02 — YAML Config" in result
+    assert "F01 — Directory Scaffold" not in result
+    assert "F03 — Another Done" not in result
+
+
+def test_filter_done_features_count_summary():
+    result = runner.filter_done_features(FEATURES_WITH_DONE)
+    assert "2 completed features omitted" in result
+
+
+def test_filter_done_features_no_done():
+    result = runner.filter_done_features(FEATURES_TEXT)
+    assert "F01" in result
+    assert "F02" in result
+    assert "completed features omitted" not in result
+
+
+def test_start_task_template_has_no_spec_or_features():
+    template = (TEMPLATES_ROOT / "start_task.md").read_text()
+    assert "{{spec}}" not in template
+    assert "{{features}}" not in template
+
+
+def test_next_task_template_has_no_spec_or_features():
+    template = (TEMPLATES_ROOT / "next_task.md").read_text()
+    assert "{{spec}}" not in template
+    assert "{{features}}" not in template

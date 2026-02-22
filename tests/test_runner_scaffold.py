@@ -343,3 +343,12 @@ def test_deploy_mode_dev_repo():
     settings = runner.load_config(PROJECT_ROOT)
     context = runner.build_context(PROJECT_ROOT, settings, {"deploy_mode"}, args)
     assert context["deploy_mode"] == "dev-repo"
+
+
+# --- F31: parallel-safety documentation ---
+
+def test_readme_contains_parallel_usage_section():
+    readme = (Path(__file__).parent.parent / "README.md").read_text()
+    assert "## Parallel Usage" in readme
+    assert "task-start" in readme
+    assert "exclusive access" in readme.lower()
