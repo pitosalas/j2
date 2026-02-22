@@ -1,5 +1,9 @@
 # j2
 
+[![CI](https://github.com/pitosalas/j2/actions/workflows/ci.yml/badge.svg)](https://github.com/pitosalas/j2/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+
 A structured development framework for building software projects with [Claude Code](https://claude.ai/claude-code). j2 breaks development into explicit, user-controlled steps — from writing your first spec to shipping a tested feature — one slash command at a time.
 
 > j2 was built using j2 itself.
