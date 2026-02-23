@@ -7,7 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0] — 2025-01-01
+## [0.2.0] — 2026-02-22
+
+### Added
+- `/task-run-all` — implement all tasks in a feature sequentially without stopping
+- `/features-parallel` — launch background agents to implement multiple features concurrently
+- `/adopt` — adopt an existing project into j2: detect settings, generate spec and feature list, merge config
+- `/deploy` clean export mode — strip all j2 infrastructure for a standalone project handoff
+- Token minimization: task-execution templates no longer inject full spec or feature list; completed features filtered from `{{features}}`
+- Parallel-safe command documentation: README table distinguishing per-feature (safe) vs shared-file (exclusive) commands
+- `/checkpoint` now syncs feature statuses before committing: auto-marks any fully-completed feature as `done` in `features.md`
+- `install.sh` detects existing source files and prints a reminder to run `/adopt`
+- Open source readiness: GitHub Actions CI, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, README badges, pyproject.toml linting/coverage config
+
+## [0.1.0] — 2026-01-01
 
 ### Added
 - `/refresh` — read spec, surface gaps, rewrite with suggested answers

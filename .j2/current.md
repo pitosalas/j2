@@ -1,11 +1,10 @@
 ## In Progress
-Nothing actively in progress.
+Nothing in progress.
 
 ## Just Completed
-Refactored the "auto-mark feature done when last task completes" approach:
-- Reverted changes to `run_all_tasks.md`, `start_task.md`, `next_task.md` that would have broken parallel safety
-- Moved the feature-status sync logic to `checkpoint.md` (already exclusive-access, already touches shared files)
-- Updated `j2.md`, `features.md` (F16), and `README.md` to document the new `/checkpoint` sync behavior
+- Updated copyright to 2026, author to "Pito Salas + Claude Code" in README and LICENSE
+- Populated CHANGELOG.md [Unreleased] section with all features added since 0.1.0
+- Bumped version to 0.2.0 in pyproject.toml and promoted [Unreleased] to [0.2.0] — 2026-02-22
 
 ## What's Next
 No pending tasks or features. Options:

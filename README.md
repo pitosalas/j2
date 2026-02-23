@@ -256,4 +256,4 @@ Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup inst
 
 This project is licensed under the [MIT License](LICENSE).
 
-Copyright (c) 2025 Pito Salas
+Copyright (c) 2026 Pito Salas + Claude Code
