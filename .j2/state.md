@@ -1,3 +1,3 @@
-completed: Milestone F33 granted — /features-parallel command complete, README updated, all 33 features done
+completed: Granted milestone for F35 (install script adopt message) — 2 tests pass, task file archived, features.md updated
 state: 0 spec gaps | 0 features need tasks | 0 tasks pending
-next: /features-update or /deploy
+next: /features-update (to add new features) or /deploy (to ship)

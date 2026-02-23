@@ -82,6 +82,21 @@ After installing into a new project directory:
 - Run tests before declaring any task done
 ```
 
+## Adopting an Existing Project
+
+If you already have code, run `install.sh` on your project directory first, then run `/adopt` in Claude Code. It performs these steps automatically:
+
+1. **Detect settings** — scans for `pyproject.toml`, `package.json`, `Cargo.toml`, etc. and writes detected language/framework into `settings.yaml`
+2. **Generate a spec** — reads your source, README, and config to produce a draft in `.j2/specs/<project-name>.md`
+3. **Generate a feature list** — maps existing functionality to features, marking implemented ones `done` (runs tests to set test status)
+4. **Merge `.gitignore`** — appends j2 entries; never overwrites your existing entries
+5. **Merge `.claude/` config** — adds slash commands without touching your existing Claude settings or `CLAUDE.md`
+6. **Leave README untouched** — your existing README is preserved; it will be updated naturally by future `/milestone` runs
+
+After `/adopt` completes, continue with the normal workflow: `/refresh`, `/features-update`, `/tasks-gen`, etc.
+
+The install script also hints at this: when it detects source files in the target directory, it prints a reminder to run `/adopt`.
+
 ## Slash Commands
 
 | Command | Argument | Purpose |
@@ -96,9 +111,10 @@ After installing into a new project directory:
 | `/task-run-all` | `<feature-id>` | Implement all tasks in a feature sequentially without stopping |
 | `/features-parallel` | — | Launch background agents to implement multiple features concurrently |
 | `/milestone` | `<feature-id>` | Quality gate: confirm tests pass, archive tasks, update README |
-| `/checkpoint` | — | Save context to `.j2/current.md`, commit, and push to git |
+| `/checkpoint` | — | Save context to `.j2/current.md`, sync feature statuses, commit, and push to git |
 | `/code-review` | — | Check all source files against `rules.md`; list violations as tasks |
 | `/continue` | — | Run whatever the last command recommended as the next step |
+| `/adopt` | — | Adopt an existing project into j2: detect settings, generate spec and feature list, merge config |
 | `/deploy` | `<target-dir>` | Dev repo: bootstrap a new j2 project. Deployed project: clean export with all j2 files stripped |
 
 **Feature IDs** (e.g. `F01`) default to the current in-progress feature if omitted.

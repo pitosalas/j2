@@ -68,6 +68,11 @@ steps:
     template: "code_review.md"
     description: "Review all source files against rules.md and output violations as tasks."
 
+  - id: adopt
+    command: "/adopt"
+    template: "adopt.md"
+    description: "Adopt an existing project into j2 by scanning, generating spec/features, and merging config."
+
   - id: deploy
     command: "/deploy"
     template: "deploy.md"

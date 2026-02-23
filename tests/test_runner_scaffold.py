@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tests for scaffold/config/install: F15 rules, F02 YAML config, F01 scaffold dirs, F12 arg patterns, F14 ROS2, F19 deploy, F26 code-review."""
+"""Tests for scaffold/config/install: F15 rules, F02 YAML config, F01 scaffold dirs, F12 arg patterns, F14 ROS2, F19 deploy, F26 code-review, F35 adopt hint."""
 # Author: Pito Salas and Claude Code
 # Open Source Under MIT license
 
@@ -352,3 +352,25 @@ def test_readme_contains_parallel_usage_section():
     assert "## Parallel Usage" in readme
     assert "task-start" in readme
     assert "exclusive access" in readme.lower()
+
+
+# --- F35: install script adopt message ---
+
+ADOPT_HINT = "Run /adopt in Claude Code to scan your existing codebase"
+
+def test_install_prints_adopt_hint_when_source_files_exist(tmp_path):
+    (tmp_path / "app.py").write_text("print('hello')")
+    result = subprocess.run(
+        ["bash", str(SCAFFOLD / "install.sh"), str(tmp_path)],
+        capture_output=True, text=True
+    )
+    assert result.returncode == 0, result.stderr
+    assert ADOPT_HINT in result.stdout
+
+def test_install_no_adopt_hint_for_empty_target(tmp_path):
+    result = subprocess.run(
+        ["bash", str(SCAFFOLD / "install.sh"), str(tmp_path)],
+        capture_output=True, text=True
+    )
+    assert result.returncode == 0, result.stderr
+    assert ADOPT_HINT not in result.stdout

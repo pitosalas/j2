@@ -13,6 +13,12 @@ Output the content of `current.md` only — no explanation.
 
 After outputting the content, write it to `.j2/current.md`, overwriting any existing file.
 
+Before committing, sync feature statuses:
+
+1. For each feature in `features.md` whose `**Status**` is not `done`, check its task file at `.j2/tasks/<feature-id>.md`.
+2. If the task file exists and every task in it has `**Status**: done`, run `pytest` and update that feature's `**Status**` line in `features.md` to: `done | Tests written: yes | Tests passing: yes` (or `no` based on results).
+3. If the task file has been archived to `.j2/tasks/done/<feature-id>.md`, treat all tasks as done and apply the same update.
+
 Then commit and push all current changes:
 
 1. Run `git add -A` to stage everything.

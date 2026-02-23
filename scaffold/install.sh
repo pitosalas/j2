@@ -81,8 +81,23 @@ done
 
 echo ""
 echo "Installation complete."
+
+# --- Detect existing source files ---
+EXISTING_CODE=false
+if find "$TARGET_DIR" \
+    -path "$TARGET_DIR/.j2" -prune -o \
+    -path "$TARGET_DIR/scaffold" -prune -o \
+    \( -name '*.py' -o -name '*.js' -o -name '*.ts' -o -name '*.rs' \
+       -o -name '*.go' -o -name '*.java' -o -name '*.cpp' -o -name '*.c' \) \
+    -print -quit 2>/dev/null | grep -q .; then
+  EXISTING_CODE=true
+fi
+
 echo "Next steps:"
 echo "  1. Edit .j2/config/settings.yaml with your project name."
 echo "  2. Edit .j2/rules.md with your project's coding principles (language, testing rules, style, etc.)."
 echo "  3. Add your project spec to .j2/specs/"
 echo "  4. Run /refresh in Claude Code to begin."
+if [ "$EXISTING_CODE" = true ]; then
+  echo "  5. Run /adopt in Claude Code to scan your existing codebase and generate a spec and feature list."
+fi

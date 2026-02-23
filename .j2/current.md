@@ -1,21 +1,22 @@
 ## In Progress
-Nothing — all 33 features complete.
+Nothing actively in progress.
 
 ## Just Completed
-- F30: Token minimization — removed spec/features from task templates, added filter_done_features()
-- F31: Parallel-safe command documentation — added Parallel Usage section to README
-- F32: `/task-run-all` command — run all tasks in a feature without stopping
-- F33: `/features-parallel` command — launch background agents for multiple features
-- Updated rules.md — removed redundant rules, added testing/output/error-handling rules
-- Created `.claude/CLAUDE.md` for session orientation
-- Fixed merge conflict in README badges
+Refactored the "auto-mark feature done when last task completes" approach:
+- Reverted changes to `run_all_tasks.md`, `start_task.md`, `next_task.md` that would have broken parallel safety
+- Moved the feature-status sync logic to `checkpoint.md` (already exclusive-access, already touches shared files)
+- Updated `j2.md`, `features.md` (F16), and `README.md` to document the new `/checkpoint` sync behavior
 
-## Next Steps
-- Use `/features-update` to add new features, or `/deploy` to ship
-- Test `/task-run-all` and `/features-parallel` on a real multi-feature project
+## What's Next
+No pending tasks or features. Options:
+- `/features-update` to add new features
+- `/deploy` to ship
 
 ## Open Questions
 None.
 
 ## Feature Status Summary
-All 33 features done (F01–F33). No incomplete features. 121 tests passing.
+
+| Feature | Status |
+|---|---|
+| All 33 features | done |

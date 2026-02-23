@@ -11,6 +11,13 @@ Status values:
 
 <!-- ===== COMPLETED FEATURES (High → Medium → Low) ===== -->
 
+## F34 — `/adopt` Command
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: One-time command for adding j2 to an existing project. Auto-detects project settings from marker files, generates a draft spec from the codebase, produces a feature list with existing work marked `done` (running tests to set test status), merges `.gitignore` and `.claude/` config without overwriting, and leaves the existing README untouched. After completion the project is fully j2-managed.
+
+---
+
 ## F33 — `/features-parallel` Command
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes
@@ -179,6 +186,13 @@ Status values:
 
 ---
 
+## F35 — Install Script Adopt Message
+**Priority**: Medium
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Update `install.sh` to detect when the target directory already contains source files and print a message at the end: "Run /adopt to scan your existing codebase and generate a spec and feature list."
+
+---
+
 ## F31 — Parallel-Safe Command Documentation
 **Priority**: Medium
 **Status**: done | Tests written: yes | Tests passing: yes
@@ -203,7 +217,7 @@ Status values:
 ## F16 — `/checkpoint` Command
 **Priority**: Medium
 **Status**: done | Tests written: yes | Tests passing: yes
-**Description**: Saves current working context to `.j2/current.md` so the developer can resume later. Captures what is in progress, what was just completed, what is next, and any open questions. Unlike `/milestone`, this is not a quality gate — it can be run at any point during work.
+**Description**: Saves current working context to `.j2/current.md` so the developer can resume later. Captures what is in progress, what was just completed, what is next, and any open questions. Before committing, scans all non-done features and marks any fully-completed feature (all tasks `done`) as `done` in `features.md`, running `pytest` to set test status. Unlike `/milestone`, this is not a quality gate — it can be run at any point during work.
 
 ---
 
