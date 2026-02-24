@@ -1,21 +1,26 @@
 ## In Progress
-Nothing in progress.
+
+Nothing — all 36 features done.
 
 ## Just Completed
-- Updated copyright to 2026, author to "Pito Salas + Claude Code" in README and LICENSE
-- Populated CHANGELOG.md [Unreleased] section with all features added since 0.1.0
-- Bumped version to 0.2.0 in pyproject.toml and promoted [Unreleased] to [0.2.0] — 2026-02-22
 
-## What's Next
-No pending tasks or features. Options:
-- `/features-update` to add new features
-- `/deploy` to ship
+- **F36**: `/features-update` now auto-generates task files for newly added features and enforces two-section `features.md` ordering
+- **F37**: Added existence guards to `start_task.md`, `next_task.md`, `run_all_tasks.md`, `gen_tasks.md`; fixed `checkpoint.md` idempotency (skip commit if nothing staged)
+- **F38**: `/adopt` now detects re-runs and switches to surgical update mode (runner.py + templates + config only; user files untouched)
+- Workflow Principles section added to spec (`j2.md`)
+
+## Next Steps
+
+- Run `/milestone F38` to formally close it
+- Consider `/deploy` to export a clean copy
 
 ## Open Questions
-None.
+
+- Pre-existing failures in `test_commands.py` and `test_adopt.py` (scaffold `.claude/commands/` deleted) — needs a separate fix or `/code-review` pass
 
 ## Feature Status Summary
 
 | Feature | Status |
 |---|---|
-| All 33 features | done |
+| All F01–F38 | done |
+| Pre-existing scaffold test failures | unresolved (separate issue) |

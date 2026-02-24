@@ -387,3 +387,44 @@ def test_features_parallel_slash_command_exists():
     assert cmd_path.exists()
     content = cmd_path.read_text()
     assert "runner.py features-parallel" in content
+
+
+# --- F36: /features-update auto-task-gen and two-section invariant ---
+
+def test_update_features_template_contains_auto_task_gen():
+    template = (TEMPLATES_ROOT / "update_features.md").read_text()
+    assert "newly added" in template
+    assert "task file" in template
+
+def test_update_features_template_contains_two_section_invariant():
+    template = (TEMPLATES_ROOT / "update_features.md").read_text()
+    assert "incomplete" in template.lower()
+    assert "completed" in template.lower()
+    assert "two-section" in template.lower() or "two section" in template.lower()
+
+
+# --- F37: workflow principle guards in templates ---
+
+def test_start_task_template_has_missing_file_guard():
+    template = (TEMPLATES_ROOT / "start_task.md").read_text()
+    assert "does not exist" in template
+    assert "Error:" in template
+
+def test_next_task_template_has_missing_file_guard():
+    template = (TEMPLATES_ROOT / "next_task.md").read_text()
+    assert "does not exist" in template
+    assert "Error:" in template
+
+def test_run_all_tasks_template_has_missing_file_guard():
+    template = (TEMPLATES_ROOT / "run_all_tasks.md").read_text()
+    assert "does not exist" in template
+    assert "Error:" in template
+
+def test_gen_tasks_template_has_feature_guard():
+    template = (TEMPLATES_ROOT / "gen_tasks.md").read_text()
+    assert "not yet available" in template
+    assert "Error:" in template
+
+def test_checkpoint_template_skips_commit_when_nothing_staged():
+    template = (TEMPLATES_ROOT / "checkpoint.md").read_text()
+    assert "empty" in template or "nothing staged" in template or "No changes" in template

@@ -1,3 +1,3 @@
-completed: Deployed fresh j2 project scaffold to /Users/pitosalas/temp/raindropper
+completed: Checkpoint — committed F36-F38 (auto-task-gen, workflow guards, adopt re-run mode); all 36 features done.
 state: 0 spec gaps | 0 features need tasks | 0 tasks pending
-next: /features-update (to add new features) or /deploy (to ship)
+next: /milestone F38

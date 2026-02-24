@@ -96,3 +96,10 @@ def test_adopt_command_takes_no_arguments():
     cmd_path = Path(__file__).parent.parent / ".claude" / "commands" / "adopt.md"
     content = cmd_path.read_text()
     assert "$ARGUMENTS" not in content
+
+
+def test_adopt_template_contains_rerun_detection():
+    template = (TEMPLATES_ROOT / "adopt.md").read_text()
+    assert "already" in template.lower() or "re-run" in template.lower() or "surgical" in template.lower()
+    assert "runner.py" in template
+    assert "templates" in template

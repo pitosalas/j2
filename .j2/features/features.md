@@ -11,6 +11,27 @@ Status values:
 
 <!-- ===== COMPLETED FEATURES (High → Medium → Low) ===== -->
 
+## F38 — /adopt Re-run Mode: Surgical Update
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: When `/adopt` is run on a project that already has j2 installed (`.j2/` exists with `runner.py`, `config/`, and `templates/`), detect the re-run and switch to surgical update mode: refresh `runner.py`, `templates/`, and `config/` from the j2 dev repo master copies (same as install.sh rsync logic), merge any new slash commands into `.claude/commands/` without touching existing ones, and leave all user files (`specs/`, `features/`, `tasks/`, `rules.md`, `README.md`) completely untouched. Do not re-run the spec/feature generation steps. Exit with a summary of what was updated.
+
+---
+
+## F37 — Enforce Workflow Principles in Templates
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: Enforce the three workflow principles added to the spec. Principle 3 (no programming without a task; no task without a feature) is entirely missing: add guards to `start_task.md`, `next_task.md`, and `run_all_tasks.md` to exit with a clear error if no task file exists, and to `gen_tasks.md` to exit if the feature ID is not in `features.md`. Fix two idempotency gaps: `milestone.md` should skip archiving if the task file is already in `done/`; `checkpoint.md` should skip the git commit if nothing has changed.
+
+---
+
+## F36 — Auto-Generate Tasks After /features-update Adds a Feature
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: When `/features-update` adds one or more new features to the feature list, it automatically generates a task file for each new feature (equivalent to running `/tasks-gen <feature-id>` for each). This eliminates the manual follow-up step. If `/features-update` only modifies or removes existing features (no new features added), no task generation occurs.
+
+---
+
 ## F34 — `/adopt` Command
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes

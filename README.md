@@ -224,7 +224,7 @@ Yes — that's the point. `features.md`, task files, `rules.md`, and spec files 
 Run `/continue`. It reads `.j2/state.md` (written by the last command) and picks up exactly where you left off. If you want more context, read `.j2/current.md` — that's what `/checkpoint` saves.
 
 **What if I want to add a feature mid-project?**
-Run `/features-update` and describe what you want to add. It will insert the new feature at the right priority level. Then run `/tasks-gen <new-feature-id>` and continue with `/task-next`.
+Run `/features-update` and describe what you want to add. It will insert the new feature at the right priority level and automatically generate a task file for it. Then continue with `/task-next`.
 
 **What if a task is too big or too vague?**
 Run `/tasks-update <feature-id>` and ask Claude to split it or clarify it. The task file is also plain Markdown — you can edit it directly.

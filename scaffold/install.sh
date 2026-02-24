@@ -35,12 +35,13 @@ echo "PyYAML ... OK"
 # --- Create target directory ---
 mkdir -p "$TARGET_DIR"
 
-# --- Copy scaffold ---
+# --- Copy scaffold (user-customizable files only: specs, features, tasks, rules) ---
 echo "Copying scaffold to $TARGET_DIR ..."
 rsync -a --ignore-existing \
   --exclude='__pycache__' \
   --exclude='*.pyc' \
   --exclude='.DS_Store' \
+  --exclude='.claude' \
   "$SCRIPT_DIR/" "$TARGET_DIR/"
 echo "Scaffold copied."
 
@@ -69,6 +70,25 @@ if [ -d "$CONFIG_SRC" ]; then
   echo "Config installed."
 else
   echo "WARNING: config not found at $CONFIG_SRC — copy it manually to $TARGET_DIR/.j2/config/" >&2
+fi
+
+# --- Copy .claude/commands and CLAUDE.md from j2 source repo ---
+COMMANDS_SRC="$(dirname "$SCRIPT_DIR")/.claude/commands"
+if [ -d "$COMMANDS_SRC" ]; then
+  mkdir -p "$TARGET_DIR/.claude/commands"
+  rsync -a --ignore-existing "$COMMANDS_SRC/" "$TARGET_DIR/.claude/commands/"
+  echo "Slash commands installed."
+else
+  echo "WARNING: .claude/commands not found at $COMMANDS_SRC — copy them manually to $TARGET_DIR/.claude/commands/" >&2
+fi
+
+CLAUDE_MD_SRC="$(dirname "$SCRIPT_DIR")/.claude/CLAUDE.md"
+if [ -f "$CLAUDE_MD_SRC" ]; then
+  mkdir -p "$TARGET_DIR/.claude"
+  cp -n "$CLAUDE_MD_SRC" "$TARGET_DIR/.claude/CLAUDE.md" 2>/dev/null || true
+  echo "CLAUDE.md installed."
+else
+  echo "WARNING: .claude/CLAUDE.md not found at $CLAUDE_MD_SRC" >&2
 fi
 
 # --- Validate YAML configs ---
