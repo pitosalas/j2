@@ -5,20 +5,24 @@
 
 from pathlib import Path
 
-COMMANDS_DIR = Path(__file__).parent.parent / "scaffold" / ".claude" / "commands"
+COMMANDS_DIR = Path(__file__).parent.parent / ".claude" / "commands"
 
 EXPECTED_COMMANDS = [
     "refresh",
     "features-gen",
     "features-update",
+    "features-parallel",
     "tasks-gen",
     "tasks-update",
     "task-start",
     "task-next",
+    "task-run-all",
     "checkpoint",
     "milestone",
     "code-review",
     "deploy",
+    "adopt",
+    "continue",
 ]
 
 
@@ -79,7 +83,7 @@ def test_deploy_passes_target_argument():
 
 def test_no_arg_commands_have_no_arguments_placeholder():
     # Commands that take no arguments should not reference $ARGUMENTS.
-    for name in ("refresh", "features-gen", "features-update", "task-next", "checkpoint", "continue", "code-review"):
+    for name in ("refresh", "features-gen", "features-update", "features-parallel", "task-next", "checkpoint", "continue", "code-review", "adopt"):
         content = (COMMANDS_DIR / f"{name}.md").read_text()
         assert "$ARGUMENTS" not in content, \
             f"{name}.md unexpectedly references $ARGUMENTS"

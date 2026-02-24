@@ -11,6 +11,20 @@ Status values:
 
 <!-- ===== COMPLETED FEATURES (High → Medium → Low) ===== -->
 
+## F40 — `/status` Command
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: A new `/status` command that displays the current project health at a glance. Shows: spec file count, total features broken down by status (done / in progress / not started), features missing task files, count of pending tasks across all active task files, and last completed/next recommendation from `state.md`. Output is concise and human-readable — no raw file dumps.
+
+---
+
+## F39 — `/milestone` Project-Complete Gate
+**Priority**: High
+**Status**: done | Tests written: yes | Tests passing: yes
+**Description**: When `/milestone` is invoked without a feature ID, act as a project-wide completion gate. Scan `features.md` for any features that are not `done` — if any exist, list them and exit without making changes. Only if all features are `done`: run `pytest`, and if all tests pass, perform the equivalent of `/checkpoint` (write `current.md`, commit, and push). The existing single-feature milestone behavior (when a feature ID is provided) is unchanged.
+
+---
+
 ## F38 — /adopt Re-run Mode: Surgical Update
 **Priority**: High
 **Status**: done | Tests written: yes | Tests passing: yes

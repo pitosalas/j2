@@ -85,12 +85,6 @@ def test_adopt_slash_command_exists_and_calls_runner():
     assert "runner.py adopt" in content
 
 
-def test_adopt_scaffold_command_exists_and_calls_runner():
-    cmd_path = Path(__file__).parent.parent / "scaffold" / ".claude" / "commands" / "adopt.md"
-    assert cmd_path.exists()
-    content = cmd_path.read_text()
-    assert "runner.py adopt" in content
-
 
 def test_adopt_command_takes_no_arguments():
     cmd_path = Path(__file__).parent.parent / ".claude" / "commands" / "adopt.md"

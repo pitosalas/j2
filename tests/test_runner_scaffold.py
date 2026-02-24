@@ -67,7 +67,6 @@ def test_workflow_yaml_templates_all_exist():
     ".j2/specs",
     ".j2/features",
     ".j2/tasks",
-    ".claude/commands",
 ])
 def test_scaffold_required_dirs_exist(rel):
     assert (SCAFFOLD / rel).is_dir(), f"scaffold/{rel} is missing"
