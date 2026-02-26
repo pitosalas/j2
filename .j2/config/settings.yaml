@@ -3,7 +3,6 @@
 project:
   name: "j2"
   language: "python"
-  platform: "general"
 
 j2:
   specs_dir: ".j2/specs"

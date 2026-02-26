@@ -21,7 +21,7 @@ J2_ROOT = Path(__file__).parent.parent / ".j2"
 TEMPLATES_DIR = Path(__file__).parent.parent / ".j2" / "templates"
 TEMPLATES_REQUIRING_RULES = [
     "gen_features.md", "gen_tasks.md", "update_features.md", "update_tasks.md",
-    "start_task.md", "next_task.md", "milestone.md", "refresh.md", "code_review.md",
+    "next_task.md", "milestone.md", "refresh.md", "code_review.md",
 ]
 
 def test_scaffold_rules_md_exists_and_nonempty():
@@ -125,11 +125,10 @@ def test_interactive_prompt_template_contains_stop_and_wait(tmpl):
 
 INLINE_ARG_TEMPLATES = [
     "gen_tasks.md",
-    "start_task.md",
     "milestone.md",
 ]
 
-@pytest.mark.parametrize("tmpl", INLINE_ARG_TEMPLATES)
+@pytest.mark.parametrize("tmpl", ["gen_tasks.md", "milestone.md"])
 def test_inline_arg_template_uses_feature_id_placeholder(tmpl):
     content = (TEMPLATES_ROOT / tmpl).read_text()
     assert "{{feature_id}}" in content, f"{tmpl} missing {{{{feature_id}}}} placeholder"
@@ -176,29 +175,6 @@ def test_request_injected_when_request_arg_provided(tmp_path):
 
     context = runner.build_context(tmp_path, SETTINGS_FOR_F23, {"request"}, Args())
     assert context["request"] == "Split T01 into two tasks."
-
-
-# --- F14: ROS2 configuration profile ---
-
-def test_ros2_settings_yaml_is_valid_and_has_required_keys():
-    path = CONFIG_ROOT / "settings.ros2.yaml"
-    assert path.is_file(), "settings.ros2.yaml not found in .j2/config/"
-    data = yaml.safe_load(path.read_text())
-    assert data["project"]["platform"] == "ros2"
-    assert "package_type" in data["ros2"]
-    assert "node_type" in data["ros2"]
-
-@pytest.mark.parametrize("tmpl", ["gen_features.ros2.md", "gen_tasks.ros2.md"])
-def test_ros2_templates_exist_and_load(tmpl):
-    path = TEMPLATES_ROOT / tmpl
-    assert path.is_file(), f"{tmpl} not found in .j2/templates/"
-    assert len(path.read_text()) > 0
-
-@pytest.mark.parametrize("tmpl", ["gen_features.ros2.md", "gen_tasks.ros2.md"])
-def test_ros2_templates_contain_ros2_guidance(tmpl):
-    content = (TEMPLATES_ROOT / tmpl).read_text().lower()
-    assert "ros2" in content
-    assert "rclpy" in content or "rclcpp" in content
 
 
 # --- F19: /deploy command ---
