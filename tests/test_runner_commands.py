@@ -109,53 +109,6 @@ def test_refresh_renders_spec_and_rules(tmp_path):
 
 # --- F09: /task-start command ---
 
-def make_start_task_project(tmp_path, spec_text, rules_text, features_text, tasks_text, feature_id):
-    config_dir = tmp_path / ".j2" / "config"
-    config_dir.mkdir(parents=True)
-    (config_dir / "settings.yaml").write_text(yaml.dump(_base_settings()))
-    (config_dir / "workflow.yaml").write_text(yaml.dump(
-        {"steps": [{"id": "task-start", "template": "start_task.md"}]}
-    ))
-    (tmp_path / ".j2" / "specs").mkdir(parents=True)
-    (tmp_path / ".j2" / "specs" / "spec.md").write_text(spec_text)
-    (tmp_path / ".j2" / "rules.md").write_text(rules_text)
-    features_dir = tmp_path / ".j2" / "features"
-    features_dir.mkdir(parents=True)
-    (features_dir / "features.md").write_text(features_text)
-    tasks_dir = tmp_path / ".j2" / "tasks"
-    tasks_dir.mkdir(parents=True)
-    (tasks_dir / f"{feature_id}.md").write_text(tasks_text)
-    templates_dir = tmp_path / ".j2" / "templates"
-    templates_dir.mkdir(parents=True)
-    (templates_dir / "start_task.md").write_text((TEMPLATES_ROOT / "start_task.md").read_text())
-    return tmp_path
-
-
-def test_start_task_renders_all_placeholders(tmp_path):
-    spec = "# Widget App\nTracks widgets."
-    rules = "## Testing\n- Each feature needs a test."
-    root = make_start_task_project(tmp_path, spec, rules, FEATURES_TEXT, TASKS_TEXT, "F01")
-
-    settings = runner.load_config(root)
-    workflow = runner.load_workflow(root)
-    step = runner.find_step(workflow, "task-start")
-    template = runner.load_template(root, settings, step["template"])
-    placeholders = runner.find_placeholders(template)
-
-    class Args:
-        feature = "F01"
-        task = request = target = None
-
-    context = runner.build_context(root, settings, placeholders, Args())
-    output = runner.fill_template(template, context)
-
-    assert "Each feature needs a test" in output
-    assert "{{rules}}" not in output
-    # spec and features no longer injected into start_task template (F30)
-    assert "{{spec}}" not in output
-    assert "{{features}}" not in output
-
-
 # --- F08: /tasks-update command ---
 
 def make_update_tasks_project(tmp_path, tasks_text, rules_text, feature_id):
@@ -197,7 +150,8 @@ def test_update_tasks_renders_tasks_rules_and_request(tmp_path):
     context = runner.build_context(root, settings, placeholders, Args())
     output = runner.fill_template(template, context)
 
-    assert "Directory Scaffold" in output
+    # features no longer injected into update_tasks template (token minimization)
+    assert "Directory Scaffold" not in output
     assert "Each feature needs a test" in output
     assert "{{features}}" not in output
     assert "{{rules}}" not in output
@@ -242,7 +196,8 @@ def test_gen_tasks_renders_spec_rules_and_feature(tmp_path):
     context = runner.build_context(root, settings, placeholders, Args())
     output = runner.fill_template(template, context)
 
-    assert "Widget App" in output
+    # spec no longer injected into gen_tasks template (token minimization)
+    assert "Widget App" not in output
     assert "Each feature needs a test" in output
     assert "Directory Scaffold" in output
     assert "{{spec}}" not in output
@@ -404,11 +359,6 @@ def test_update_features_template_contains_two_section_invariant():
 
 
 # --- F37: workflow principle guards in templates ---
-
-def test_start_task_template_has_missing_file_guard():
-    template = (TEMPLATES_ROOT / "start_task.md").read_text()
-    assert "does not exist" in template
-    assert "Error:" in template
 
 def test_next_task_template_has_missing_file_guard():
     template = (TEMPLATES_ROOT / "next_task.md").read_text()

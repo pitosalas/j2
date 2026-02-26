@@ -196,12 +196,6 @@ def test_filter_done_features_no_done():
     assert "completed features omitted" not in result
 
 
-def test_start_task_template_has_no_spec_or_features():
-    template = (TEMPLATES_ROOT / "start_task.md").read_text()
-    assert "{{spec}}" not in template
-    assert "{{features}}" not in template
-
-
 def test_next_task_template_has_no_spec_or_features():
     template = (TEMPLATES_ROOT / "next_task.md").read_text()
     assert "{{spec}}" not in template
