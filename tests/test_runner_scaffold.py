@@ -133,7 +133,7 @@ def test_inline_arg_template_uses_feature_id_placeholder(tmpl):
     content = (TEMPLATES_ROOT / tmpl).read_text()
     assert "{{feature_id}}" in content, f"{tmpl} missing {{{{feature_id}}}} placeholder"
 
-@pytest.mark.parametrize("tmpl", ["update_tasks.md", "gen_tasks.md"])
+@pytest.mark.parametrize("tmpl", ["gen_tasks.md"])
 def test_template_uses_features_placeholder(tmpl):
     content = (TEMPLATES_ROOT / tmpl).read_text()
     assert "{{features}}" in content, f"{tmpl} missing {{{{features}}}} placeholder"

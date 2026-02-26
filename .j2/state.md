@@ -1,3 +1,3 @@
-completed: Checkpointed — committed F39-F40 and /status compute refactor, pushed to main.
+completed: Removed ROS2 templates, features, and documentation; consolidated task-start to use next_task.md
 state: 0 spec gaps | 0 features need tasks | 0 tasks pending
 next: /features-update (to add new features) or /deploy (to ship)
