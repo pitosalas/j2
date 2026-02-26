@@ -54,6 +54,3 @@ These principles apply to all code written in this project.
 
 ## Code Quality
 - Don't assign a function result to a variable just to use it once — call directly
-
-## ROS
-- Use ROS2 and colcon builds for ROS2 programs

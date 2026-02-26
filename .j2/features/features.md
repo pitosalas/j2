@@ -268,9 +268,3 @@ Status values:
 **Status**: done | Tests written: yes | Tests passing: yes
 **Description**: After `/milestone` grants a feature complete, the feature's task file (`.j2/tasks/<feature-id>.md`) is moved to `.j2/tasks/done/<feature-id>.md`. This keeps the active tasks directory focused on pending work. The runner's `missing_tasks_summary` function checks both `.j2/tasks/` and `.j2/tasks/done/` so archived features are not re-flagged as missing task files. The scaffold ships with the `tasks/done/` directory pre-created.
 
----
-
-## F14 — ROS2 Configuration Profile
-**Priority**: Low
-**Status**: done | Tests written: yes | Tests passing: yes
-**Description**: A ROS2-specific configuration profile (YAML) and prompt templates that tailor feature and task generation for ROS2 packages, nodes, topics, and launch files.
