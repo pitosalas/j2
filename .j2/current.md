@@ -1,25 +1,37 @@
-## In Progress
+# Checkpoint: ROS2 Removal & Template Pruning
 
-Nothing — all 38 features done.
+## What Was Just Completed
 
-## Just Completed
+Completed comprehensive removal of ROS2 support from the j2 framework:
 
-- **F39**: `/milestone` project-complete gate (no-arg invocation scans all features, runs pytest, then checkpoints)
-- **F40**: `/status` command — template, workflow.yaml entry, slash command, 6 tests
-- **`/status` refactor**: moved all computation into `runner.py` (`compute_status()`), bypasses template system, outputs final text directly — eliminates extra tool calls
-- Deployed updated `runner.py` + new templates/commands to `brh-website-2` via `/adopt` surgical update
+1. **Template & Config Cleanup**: Deleted ROS2-specific templates (`gen_features.ros2.md`, `gen_tasks.ros2.md`), ROS2 config file (`settings.ros2.yaml`), and ROS2 sample (`ros2_sensor_node.md`)
+2. **Feature Removal**: Removed F14 (ROS2 Configuration Profile) from features list and deleted its task file
+3. **Start_task Redirect**: Consolidated `/task-start` command to use `next_task.md` instead of redundant `start_task.md`; deleted `start_task.md` template
+4. **Documentation Cleanup**: Removed ROS2 references from spec goals and future targets; removed ROS coding section from rules.md
+5. **Config Cleanup**: Removed unnecessary `platform: general` field from settings.yaml
+6. **Test Suite**: Updated test suite — removed 3 ROS2-specific tests, updated parametrized tests to reflect removed templates
 
-## Next Steps
+All 44 tests pass. Project is now purely general-purpose with no ROS infrastructure.
 
-- Add new features via `/features-update`, or
-- Ship with `/deploy`
+## What Is Currently In Progress
+
+None — all features are complete.
+
+## What Is Next
+
+- `/features-update` — add new features to the framework
+- `/deploy` — ship the framework to a new project
 
 ## Open Questions
 
-- User evaluating whether the single Bash tool call block in `/status` output is acceptable vs. a shell alias approach.
+None.
 
 ## Feature Status Summary
 
-| Feature | Status |
-|---|---|
-| All F01–F40 | done |
+All 37 features are `done`. No incomplete work.
+
+| Status | Count |
+|--------|-------|
+| Done | 37 |
+| In Progress | 0 |
+| Not Started | 0 |
